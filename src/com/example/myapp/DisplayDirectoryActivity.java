@@ -18,10 +18,10 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class DisplayExternalActivity extends Activity {
+public class DisplayDirectoryActivity extends Activity {
 	
-	List<Map<String, String>> directories = new ArrayList<Map<String,String>>();
-	String base;
+	List<Map<String, String>> currentFileList = new ArrayList<Map<String,String>>();
+	String path;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +30,9 @@ public class DisplayExternalActivity extends Activity {
 		// Show the Up button in the action bar.
 		setupActionBar();
 		
-		//Receive current root
-		String root = (String) getIntent().getCharSequenceExtra("root");
-		this.base = root;
+		//Receive current directory path
+		String currentPath = (String) getIntent().getCharSequenceExtra("currentPath");
+		this.path = currentPath;
 		
 		//Add all directories on external SD card to List->Map for display in ListView
 		populateFiles();
@@ -41,7 +41,7 @@ public class DisplayExternalActivity extends Activity {
 		ListView lv = (ListView) findViewById(R.id.listView);
 		
 		//Create a new adapter with the files needed to be listed
-		SimpleAdapter simpleAdpt = new SimpleAdapter(this, directories, android.R.layout.simple_list_item_1, new String[] {"directory"}, new int[] {android.R.id.text1});
+		SimpleAdapter simpleAdpt = new SimpleAdapter(this, currentFileList, android.R.layout.simple_list_item_1, new String[] {"file"}, new int[] {android.R.id.text1});
 		
 		//Set the new adapter to the ListView
 		lv.setAdapter(simpleAdpt);
@@ -54,8 +54,8 @@ public class DisplayExternalActivity extends Activity {
 				TextView clickedView = (TextView) view;
 				
 				
-				Intent intent = new Intent(DisplayExternalActivity.this, DisplayExternalActivity.class);
-				intent.putExtra("root",base + "/" + clickedView.getText());
+				Intent intent = new Intent(DisplayDirectoryActivity.this, DisplayDirectoryActivity.class);
+				intent.putExtra("currentPath",path + "/" + clickedView.getText());
 				startActivity(intent);
 				}
 			});
@@ -74,11 +74,11 @@ public class DisplayExternalActivity extends Activity {
 	}
 	
 	public void populateFiles() {
-		File root = new File(base);
+		File root = new File(path);
 		String[] subFiles = root.list();
 	
 		for (int i = 0; i < subFiles.length-1; i++) {
-			directories.add(createEntry("directory", subFiles[i]));
+			currentFileList.add(createEntry("file", subFiles[i]));
 		}
 		
 	}

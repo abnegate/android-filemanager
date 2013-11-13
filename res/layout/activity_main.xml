@@ -26,7 +26,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/linearLayout1"
-        android:text="@string/button_internal" />
+        android:text="@string/button_internal"
+        android:onClick="showInternal" />
 
     <Button
         android:id="@+id/button_external"

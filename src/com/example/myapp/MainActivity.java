@@ -33,10 +33,15 @@ public class MainActivity extends Activity {
     }
     
     public void showExternal(View view) {
-    	Intent intent = new Intent(this, DisplayExternalActivity.class);
-    	intent.putExtra("root", "/");
+    	Intent intent = new Intent(this, DisplayDirectoryActivity.class);
+    	intent.putExtra("root", "/storage/extSdCard");
     	startActivity(intent);
-    	
+    }
+    
+    public void showInternal(View view) {
+    	Intent intent = new Intent(this, DisplayDirectoryActivity.class);
+    	intent.putExtra("currentPath", "/sdcard");
+    	startActivity(intent);
     }
     
 }
