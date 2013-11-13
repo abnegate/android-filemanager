@@ -1,12 +1,11 @@
 package com.example.myapp;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Menu;
 import android.view.View;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -23,25 +22,23 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-    public void showToast(View view) {
-    	Context context = getApplicationContext();
-    	CharSequence text = "Get fucked, this does nothing.";
-    	int duration = Toast.LENGTH_LONG;
-    	
-    	Toast toast = Toast.makeText(context, text, duration);
-    	toast.show();    	
-    }
     
     public void showExternal(View view) {
     	Intent intent = new Intent(this, DisplayDirectoryActivity.class);
-    	intent.putExtra("root", "/storage/extSdCard");
+    	//Need a method for external card, rather than hard coding
+    	intent.putExtra("currentPath", "/storage/extSdCard");
     	startActivity(intent);
     }
     
     public void showInternal(View view) {
     	Intent intent = new Intent(this, DisplayDirectoryActivity.class);
-    	intent.putExtra("currentPath", "/sdcard");
+    	intent.putExtra("currentPath", Environment.getExternalStorageDirectory().getPath());
     	startActivity(intent);
     }
     
+    public void searchDevice() {
+    	
+    }
 }
+    
+
