@@ -27,7 +27,7 @@
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/linearLayout1"
         android:text="@string/button_internal"
-        android:onClick="showInternal" />
+        android:onClick="openInternal" />
 
     <Button
         android:id="@+id/button_external"
@@ -38,29 +38,6 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:text="@string/button_external"
-        android:onClick="showExternal"/>
-
-
-
-    <EditText
-        android:id="@+id/editText_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button_intenal"
-        android:layout_below="@+id/linearLayout1"
-        android:layout_marginTop="24dp"
-        android:ems="10" 
-        android:hint="@string/search"/>
-
-    <ImageButton
-        android:contentDescription="@string/search_image_description"
-        android:id="@+id/imageButton_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/editText_search"
-        android:layout_marginLeft="15dp"
-        android:layout_toRightOf="@+id/editText_search"
-        android:src="@android:drawable/ic_search_category_default"
-        android:onClick="searchDevice" />
+        android:onClick="openExternal"/>
 
 </RelativeLayout>

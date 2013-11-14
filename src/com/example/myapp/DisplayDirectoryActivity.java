@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
-
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.os.Build;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -22,8 +22,7 @@ public class DisplayDirectoryActivity extends Activity {
 	
 	List<Map<String, String>> currentFileList = new ArrayList<Map<String,String>>();
 	
-	int pathCount;
-	Stack<String> pathStack = new Stack<String>();
+	String path;
 	
 	ListView lv;
 	SimpleAdapter simpleAdpt;
@@ -31,13 +30,13 @@ public class DisplayDirectoryActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_display_external);
+		setContentView(R.layout.display_directory_activity);
 		// Show the Up button in the action bar.
-		setupActionBar();
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		//Receive current directory path
 		String currentPath = (String) getIntent().getCharSequenceExtra("currentPath");
-		pathStack.push(currentPath);
+		path = currentPath;
 		
 		//Add all directories on external SD card to List->Map for display in ListView
 		populateFiles();
@@ -55,39 +54,59 @@ public class DisplayDirectoryActivity extends Activity {
 			
 			public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
 				//View is a text view so it can be cast
-				TextView clickedView = (TextView) view;
+				TextView clickedItem = (TextView) view;
 				
-				//Update path to new directory based on click
-				pathStack.push(pathStack.peek() + "/" + clickedView.getText());
-				populateFiles();
-				simpleAdpt.notifyDataSetChanged();
+				//Update path and listview to new directory based on what was clicked
+				path += "/" + clickedItem.getText();
+				
+				File currentFile = new File(path);
+				//Create a new file from the updated path and check if it is a directory or file
+				if (currentFile.isDirectory()) {
+					populateFiles();
+					simpleAdpt.notifyDataSetChanged();
+				}
+				else if (currentFile.isFile()) {
+					//Create new intent and set it 
+	                Intent intent = new Intent();
+	                intent.setAction(android.content.Intent.ACTION_VIEW);
+	               
+	                //Get extension type of file
+	                MimeTypeMap mime = MimeTypeMap.getSingleton();
+	                String ext=currentFile.getName().substring(currentFile.getName().indexOf(".")+1);
+	                String type = mime.getMimeTypeFromExtension(ext);
+	                //Give intent the filename and extension
+	                intent.setDataAndType(Uri.fromFile(currentFile),type);
+	                //Set path back to parent of file opened
+					File currentDirectory = new File(path);
+					path = currentDirectory.getParent();
+	                //Start the new activity, launching the file with defualt application
+	                startActivity(intent);
+				}
 			}
 		});
 	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void setupActionBar() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
-	}
+	 @Override
+	 public boolean onCreateOptionsMenu(Menu menu) {
+		 // Inflate the menu; this adds items to the action bar if it is present.
+		 getMenuInflater().inflate(R.menu.main_activity_actions, menu);
+		 return true;
+	 }
 	
 	public void populateFiles() {
 		//Clear list for updating
 		currentFileList.clear();
 		//Create a file from the current path
-		File root = new File(pathStack.peek());
+		File root = new File(path);
 		//Array of the files within the current directory
 		String[] subFiles = root.list();
 	
+		//Add each file in the current directory to currentFileList
 		for (int i = 0; i < subFiles.length-1; i++) {
 			currentFileList.add(createEntry("file", subFiles[i]));
 		}
 	}
 	
+	//Create a map of key to filename for adding to the currentFileList
 	private HashMap<String, String> createEntry(String key, String name) {
 		HashMap<String, String> entry = new HashMap<String, String>();
 		entry.put(key, name);
@@ -96,11 +115,13 @@ public class DisplayDirectoryActivity extends Activity {
 		
 	}
 	
+	//Override back button to move up one level in the filesystem on press
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)  {
-		if (pathStack.size() > 1) {
+		if (path.length() > 1) {
 			if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-				pathStack.pop();
+				File currentDirectory = new File(path);
+				path = currentDirectory.getParent();
 				populateFiles();
 				simpleAdpt.notifyDataSetChanged();
 				return true;
