@@ -9,5 +9,6 @@
     <string name="version_number">0.1</string>
     <string name="action_search_title">Search</string>
     <string name="action_search_hint">Please enter a search term.</string>
+    <string name="image_view_description">An image dependent on file type.</string>
 
 </resources>

@@ -21,7 +21,6 @@ import android.widget.TextView;
 public class DisplayDirectoryActivity extends Activity {
 
 	List<Map<String, String>> currentFileList = new ArrayList<Map<String, String>>();
-
 	String path;
 	String query;
 
@@ -47,7 +46,9 @@ public class DisplayDirectoryActivity extends Activity {
 		lv = (ListView) findViewById(R.id.listView);
 
 		// Create a new adapter with the files needed to be listed
-		simpleAdpt = new SimpleAdapter(this.getBaseContext(), currentFileList, R.layout.list_view, new String[] { "file", "img" }, new int[] { R.id.file, R.id.img });
+		simpleAdpt = new SimpleAdapter(getBaseContext(), currentFileList,
+				R.layout.list_view_adapter, new String[] { "file", "img" },
+				new int[] { R.id.file, R.id.img });
 		// Set the new adapter to the ListView
 		lv.setAdapter(simpleAdpt);
 
@@ -56,7 +57,7 @@ public class DisplayDirectoryActivity extends Activity {
 
 			public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
 				// View is a text view so it can be cast
-				TextView clickedItem = (TextView) view;
+				TextView clickedItem = (TextView) view.findViewById(R.id.file);
 
 				// Update path and listview to new directory based on what was
 				// clicked
@@ -68,8 +69,8 @@ public class DisplayDirectoryActivity extends Activity {
 				if (currentFile.isDirectory()) {
 					populateFiles();
 					simpleAdpt.notifyDataSetChanged();
-				} 
-				
+				}
+
 				else if (currentFile.isFile()) {
 					// Create new intent and set it
 					Intent intent = new Intent();
@@ -79,15 +80,16 @@ public class DisplayDirectoryActivity extends Activity {
 					MimeTypeMap mime = MimeTypeMap.getSingleton();
 					String ext = currentFile.getName().substring(currentFile.getName().indexOf(".") + 1);
 					String type = mime.getMimeTypeFromExtension(ext);
-					
+
 					// Give intent the filename and extension
 					intent.setDataAndType(Uri.fromFile(currentFile), type);
-					
+
 					// Set path back to parent of file opened
 					File currentDirectory = new File(path);
 					path = currentDirectory.getParent();
-					
-					// Start the new activity, launching the file with defualt application
+
+					// Start the new activity, launching the file with defualt
+					// application
 					startActivity(intent);
 				}
 			}
@@ -105,37 +107,31 @@ public class DisplayDirectoryActivity extends Activity {
 		// Clear list for updating
 		currentFileList.clear();
 		// Create a file from the current path
-		File path = new File(this.path);
+		File current = new File(this.path);
 		// Array of the files within the current directory
-		String[] subFiles = path.list();
+		String[] subFiles = current.list();
 
 		// Add each file in the current directory to currentFileList
 		for (int i = 0; i < subFiles.length; i++) {
-			File current = new File(subFiles[i]);
-			if (current.isFile())
-				currentFileList.add(createEntry("file", subFiles[i], String.valueOf(android.R.drawable.btn_default)));
-			else if (current.isDirectory())
-				currentFileList.add(createEntry("directory", subFiles[i], String.valueOf(android.R.drawable.arrow_down_float)));
-		}
-	}
-	
-/*	public void populateSearch(String query) {
-		currentFileList.clear();
-		File root = new File(Environment.getRootDirectory().getPath());
-		String[] subFiles = root.list();
-		for (int i = 0; i < subFiles.length; i++) {
-			if (query.equals(subFiles[i])) {
 				currentFileList.add(createEntry("file", subFiles[i]));
-			}
 		}
 	}
-*/
 
 	// Create a map of key to filename for adding to the currentFileList
-	private HashMap<String, String> createEntry(String type, String name, String imgPath) {
+	private HashMap<String, String> createEntry(String type, String name) {
 		HashMap<String, String> entry = new HashMap<String, String>();
-		entry.put("file", name);
-		entry.put("img", imgPath);
+		File current = new File(path, name);
+		//If the current file is a directory, display icon as folder
+		if (current.isFile()) {
+			entry.put(type, name);
+			entry.put("img", String.valueOf(R.drawable.file));
+		}
+		//If the current file is not a directory, display icon as a file
+		else {
+			entry.put(type, name);
+			entry.put("img", String.valueOf(R.drawable.folder));
+		}
+			
 		return entry;
 
 	}
