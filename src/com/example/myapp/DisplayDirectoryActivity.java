@@ -24,10 +24,11 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class DisplayDirectoryActivity extends Activity implements  MultiChoiceModeListener {
+public class DisplayDirectoryActivity extends Activity implements
+		MultiChoiceModeListener {
 
-	List<Map<String, String>> currentFileList = new ArrayList<Map<String, String>>();
-	int[] positions = new int[50];
+	List<String> currentFileList = new ArrayList<String>();
+	List<View> selected = new ArrayList<View>();
 	String path;
 	String query;
 
@@ -42,7 +43,8 @@ public class DisplayDirectoryActivity extends Activity implements  MultiChoiceMo
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Receive current directory path
-		String currentPath = (String) getIntent().getCharSequenceExtra("currentPath");
+		String currentPath = (String) getIntent().getCharSequenceExtra(
+				"currentPath");
 		path = currentPath;
 
 		// Add all directories on external SD card to List->Map for display in
@@ -51,80 +53,70 @@ public class DisplayDirectoryActivity extends Activity implements  MultiChoiceMo
 
 		// Create ListView attached to ListView in xml definition
 		lv = (ListView) findViewById(R.id.listView);
-		
-		//Set listview to multiple selection mode
+
+		// Set listview to multiple selection mode
 		lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 		lv.setMultiChoiceModeListener(new MultiChoiceModeListener() {
-			
-			private int rowsSelected;
 
 			@Override
 			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 				// TODO Auto-generated method stub
 				return false;
 			}
-			
+
 			@Override
 			public void onDestroyActionMode(ActionMode mode) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 				MenuInflater inflater = mode.getMenuInflater();
 				inflater.inflate(R.menu.context, menu);
-				rowsSelected = 0;
 				return true;
 			}
-			
+
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-		        switch (item.getItemId()) {
-	            case R.id.context_delete:
-	                
-	                mode.finish(); // Action picked, so close the CAB
-	                return true;
-	            default:
-	                return false;
-			
-		        }
+				switch (item.getItemId()) {
+				case R.id.context_delete:					File file = new File(path);
+					boolean deleted = file.delete();
+					if (deleted)
+						populateFiles();
+					mode.finish(); // Action picked, so close the CAB
+					return true;
+				default:
+					return false;
+
+				}
 			}
-			
+
 			@Override
-			public void onItemCheckedStateChanged(ActionMode mode, int position,long id, boolean checked) {
-				if (checked) {
-					positions[rowsSelected] = position;
-					rowsSelected++;
-					for (int i = 0; i < rowsSelected-1; i++) {
-						lv.setItemChecked(positions[i], true);
-						lv.setBackgroundColor(color.darker_gray);
-						
-					}
-				}
-				else {
-					rowsSelected--;
-					for (int i = 0; i < rowsSelected-1; i++) {
-						lv.setItemChecked(positions[i], true);
-					}
-				}
-				}
+			public void onItemCheckedStateChanged(ActionMode mode,
+					int position, long id, boolean checked) {
+
+			}
 		});
-		
+
 		// Create a new adapter with the files needed to be listed
-		mAdapter = new SimpleAdapter(getBaseContext(), currentFileList,
-				R.layout.row_list_item, new String[] { "file", "img" },
-				new int[] { R.id.file, R.id.img });
+		mAdapter = new SelectionAdapter(this, ,R.id.file, currentFileList);
 		// Set the new adapter to the ListView
 		lv.setAdapter(mAdapter);
 
 		// Set up the ListView to accept clicking on items
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-			public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
+			public void onItemClick(AdapterView<?> parentAdapter, View view,
+					int position, long id) {
 				// View is a text view so it can be cast
 				TextView clickedItem = (TextView) view.findViewById(R.id.file);
+				clickedItem.setSelected(true);
+				selected.add(clickedItem);
+				for (int i = 0; i < selected.size() - 1; i++) {
+					selected.get(i).setBackgroundColor(color.darker_gray);
+				}
 
 				// Update path and listview to new directory based on what was
 				// clicked
@@ -145,7 +137,8 @@ public class DisplayDirectoryActivity extends Activity implements  MultiChoiceMo
 
 					// Get extension type of file
 					MimeTypeMap mime = MimeTypeMap.getSingleton();
-					String ext = currentFile.getName().substring(currentFile.getName().indexOf(".") + 1);
+					String ext = currentFile.getName().substring(
+							currentFile.getName().indexOf(".") + 1);
 					String type = mime.getMimeTypeFromExtension(ext);
 
 					// Give intent the filename and extension
@@ -176,30 +169,11 @@ public class DisplayDirectoryActivity extends Activity implements  MultiChoiceMo
 		// Create a file from the current path
 		File current = new File(this.path);
 		// Array of the files within the current directory
-		String[] subFiles = current.list();
+		File[] subFiles = current.listFiles();
 		// Add each file in the current directory to currentFileList
 		for (int i = 0; i < subFiles.length; i++) {
-				currentFileList.add(createEntry("file", subFiles[i]));
+			currentFileList.add(subFiles[i].getPath());
 		}
-	}
-
-	// Create a map of key to filename for adding to the currentFileList
-	private HashMap<String, String> createEntry(String type, String name) {
-		HashMap<String, String> entry = new HashMap<String, String>();
-		File current = new File(path, name);
-		//If the current file is a directory, display icon as folder
-		if (current.isFile()) {
-			entry.put(type, name);
-			entry.put("img", String.valueOf(R.drawable.file));
-		}
-		//If the current file is not a directory, display icon as a file
-		else {
-			entry.put(type, name);
-			entry.put("img", String.valueOf(R.drawable.folder));
-		}
-			
-		return entry;
-
 	}
 
 	// Override back button to move up one level in the filesystem on press
@@ -234,7 +208,7 @@ public class DisplayDirectoryActivity extends Activity implements  MultiChoiceMo
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -247,9 +221,7 @@ public class DisplayDirectoryActivity extends Activity implements  MultiChoiceMo
 	public void onItemCheckedStateChanged(ActionMode mode, int position,
 			long id, boolean checked) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-
 }
-	
