@@ -5,12 +5,17 @@
     <string name="action_settings_title">Settings</string>
     <string name="button_internal">Internal Storage</string>
     <string name="button_external">External Storage</string>
-    <string name="display_directory_activity_title">Browsing</string>
+    <string name="display_directory_activity_title">Browsing..</string>
     <string name="version_number">0.1</string>
     <string name="action_search_title">Search</string>
     <string name="action_search_hint">Please enter a search term.</string>
     <string name="image_view_description">An image dependent on file type.</string>
     <string name="textview_places">Locations:</string>
     <string name="textview_pins">Pins:</string>
+    <string name="context_copy">Copy</string>
+    <string name="context_cut">Cut</string>
+    <string name="context_paste">Paste</string>
+    <string name="context_properties">Properties</string>
+    <string name="context_delete">Delete</string>
 
 </resources>

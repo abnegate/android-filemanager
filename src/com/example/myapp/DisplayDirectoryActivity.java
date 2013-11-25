@@ -5,27 +5,34 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import android.R.color;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-public class DisplayDirectoryActivity extends Activity {
+public class DisplayDirectoryActivity extends Activity implements  MultiChoiceModeListener {
 
 	List<Map<String, String>> currentFileList = new ArrayList<Map<String, String>>();
+	int[] positions = new int[50];
 	String path;
 	String query;
 
 	ListView lv;
-	SimpleAdapter simpleAdpt;
+	SimpleAdapter mAdapter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +51,73 @@ public class DisplayDirectoryActivity extends Activity {
 
 		// Create ListView attached to ListView in xml definition
 		lv = (ListView) findViewById(R.id.listView);
+		
+		//Set listview to multiple selection mode
+		lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
+		lv.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+			
+			private int rowsSelected;
+
+			@Override
+			public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+			
+			@Override
+			public void onDestroyActionMode(ActionMode mode) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+				MenuInflater inflater = mode.getMenuInflater();
+				inflater.inflate(R.menu.context, menu);
+				rowsSelected = 0;
+				return true;
+			}
+			
+			@Override
+			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		        switch (item.getItemId()) {
+	            case R.id.context_delete:
+	                
+	                mode.finish(); // Action picked, so close the CAB
+	                return true;
+	            default:
+	                return false;
+			
+		        }
+			}
+			
+			@Override
+			public void onItemCheckedStateChanged(ActionMode mode, int position,long id, boolean checked) {
+				if (checked) {
+					positions[rowsSelected] = position;
+					rowsSelected++;
+					for (int i = 0; i < rowsSelected-1; i++) {
+						lv.setItemChecked(positions[i], true);
+						lv.setBackgroundColor(color.darker_gray);
+						
+					}
+				}
+				else {
+					rowsSelected--;
+					for (int i = 0; i < rowsSelected-1; i++) {
+						lv.setItemChecked(positions[i], true);
+					}
+				}
+				}
+		});
+		
 		// Create a new adapter with the files needed to be listed
-		simpleAdpt = new SimpleAdapter(getBaseContext(), currentFileList,
-				R.layout.list_view_adapter, new String[] { "file", "img" },
+		mAdapter = new SimpleAdapter(getBaseContext(), currentFileList,
+				R.layout.row_list_item, new String[] { "file", "img" },
 				new int[] { R.id.file, R.id.img });
 		// Set the new adapter to the ListView
-		lv.setAdapter(simpleAdpt);
+		lv.setAdapter(mAdapter);
 
 		// Set up the ListView to accept clicking on items
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -68,7 +135,7 @@ public class DisplayDirectoryActivity extends Activity {
 				// directory or file
 				if (currentFile.isDirectory()) {
 					populateFiles();
-					simpleAdpt.notifyDataSetChanged();
+					mAdapter.notifyDataSetChanged();
 				}
 
 				else if (currentFile.isFile()) {
@@ -110,7 +177,6 @@ public class DisplayDirectoryActivity extends Activity {
 		File current = new File(this.path);
 		// Array of the files within the current directory
 		String[] subFiles = current.list();
-
 		// Add each file in the current directory to currentFileList
 		for (int i = 0; i < subFiles.length; i++) {
 				currentFileList.add(createEntry("file", subFiles[i]));
@@ -144,7 +210,7 @@ public class DisplayDirectoryActivity extends Activity {
 				File currentDirectory = new File(path);
 				path = currentDirectory.getParent();
 				populateFiles();
-				simpleAdpt.notifyDataSetChanged();
+				mAdapter.notifyDataSetChanged();
 				return true;
 			} else
 				finish();
@@ -152,4 +218,38 @@ public class DisplayDirectoryActivity extends Activity {
 
 		return super.onKeyDown(keyCode, event);
 	}
+
+	@Override
+	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onDestroyActionMode(ActionMode mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void onItemCheckedStateChanged(ActionMode mode, int position,
+			long id, boolean checked) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }
+	
