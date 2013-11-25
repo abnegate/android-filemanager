@@ -10,5 +10,7 @@
     <string name="action_search_title">Search</string>
     <string name="action_search_hint">Please enter a search term.</string>
     <string name="image_view_description">An image dependent on file type.</string>
+    <string name="textview_places">Locations:</string>
+    <string name="textview_pins">Pins:</string>
 
 </resources>

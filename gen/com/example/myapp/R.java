@@ -21,21 +21,23 @@ public final class R {
         public static final int activity_vertical_margin=0x7f040001;
     }
     public static final class drawable {
-        public static final int file=0x7f020000;
-        public static final int folder=0x7f020001;
-        public static final int ic_action_search=0x7f020002;
-        public static final int ic_launcher=0x7f020003;
+        public static final int app_icon=0x7f020000;
+        public static final int file=0x7f020001;
+        public static final int folder=0x7f020002;
+        public static final int ic_action_search=0x7f020003;
+        public static final int ic_launcher=0x7f020004;
     }
     public static final class id {
-        public static final int action_search=0x7f080008;
-        public static final int action_search_directory=0x7f080006;
-        public static final int action_settings=0x7f080007;
-        public static final int button_external=0x7f080005;
-        public static final int button_intenal=0x7f080004;
+        public static final int action_search=0x7f080009;
+        public static final int action_search_directory=0x7f080007;
+        public static final int action_settings=0x7f080008;
+        public static final int button_external=0x7f080004;
+        public static final int button_intenal=0x7f080005;
         public static final int file=0x7f080002;
         public static final int img=0x7f080001;
-        public static final int linearLayout1=0x7f080003;
         public static final int listView=0x7f080000;
+        public static final int textview_pins=0x7f080006;
+        public static final int textview_places=0x7f080003;
     }
     public static final class layout {
         public static final int display_directory_activity=0x7f030000;
@@ -56,6 +58,8 @@ public final class R {
         public static final int button_internal=0x7f050002;
         public static final int display_directory_activity_title=0x7f050004;
         public static final int image_view_description=0x7f050008;
+        public static final int textview_pins=0x7f05000a;
+        public static final int textview_places=0x7f050009;
         public static final int version_number=0x7f050005;
     }
     public static final class style {
