@@ -1,10 +1,12 @@
 package com.example.myapp;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +19,10 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 
 	private SparseBooleanArray mSelection = new SparseBooleanArray();
 	private final Context context;
-	private final String[] values;
+	private ArrayList<String> values;
 
-	public SelectionAdapter(Context context, int resource, int textViewResourceId, String[] values) {
+	public SelectionAdapter(Context context, int resource,
+			int textViewResourceId, ArrayList<String> values) {
 		super(context, resource, textViewResourceId, values);
 		this.context = context;
 		this.values = values;
@@ -54,21 +57,18 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.row_list_item, parent, false);
 		TextView textView = (TextView) rowView.findViewById(R.id.file);
 		ImageView imageView = (ImageView) rowView.findViewById(R.id.img);
-		textView.setText(values[position]);
-		// Change the icon for Windows and iPhone
-		String s = values[position];
-		File f = new File(s);
-		if (f.isDirectory()) {
+		File current = new File(values.get(position));
+		textView.setText(current.getName());
+		// Change the icon for files and folders
+		if (current.isDirectory()) {
 			imageView.setImageResource(R.drawable.folder);
 		} else {
 			imageView.setImageResource(R.drawable.file);
 		}
-
 		return rowView;
 	}
 }
