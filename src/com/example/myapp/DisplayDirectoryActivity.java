@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -104,7 +103,6 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 				// directory or file
 				if (currentFile.isDirectory()) {
 					populateFiles();
-					mAdapter.clearSelection();
 					mAdapter.notifyDataSetChanged();
 					}
 
@@ -135,25 +133,6 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	}
 	
-	// Override back button to move up one level in the filesystem on press
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (path.length() > 5) {
-			if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-				File currentDirectory = new File(path);
-				path = currentDirectory.getParent();
-				populateFiles();
-				mAdapter.clearSelection();
-				mAdapter.notifyDataSetChanged();
-				
-				return true;
-			} else
-				finish();
-		}
-
-		return super.onKeyDown(keyCode, event);
-	}
-	
 	@Override
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 		// TODO Auto-generated method stub
@@ -162,8 +141,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
-		// TODO Auto-generated method stub
-
+		mAdapter.clearSelection();
 	}
 
 	@Override
@@ -187,6 +165,27 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	@Override
 	public void onItemCheckedStateChanged(ActionMode mode,int position, long id, boolean checked) {
-
+		if (checked){
+			mAdapter.setNewSelection(position, true);;
+		}
 	}
+	
+	// Override back button to move up one level in the filesystem on press
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (path.length() > 5) {
+			if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+				File currentDirectory = new File(path);
+				path = currentDirectory.getParent();
+				populateFiles();
+				mAdapter.notifyDataSetChanged();
+				return true;
+			} else
+				finish();
+		}
+
+		return super.onKeyDown(keyCode, event);
+	}
+	
+	
 }

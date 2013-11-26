@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,6 +68,8 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 		} else {
 			imageView.setImageResource(R.drawable.file);
 		}
+		if (isPositionChecked(position))
+			rowView.setBackgroundColor(context.getResources().getColor(android.R.color.darker_gray));
 		return rowView;
 	}
 }
