@@ -1,12 +1,17 @@
 package com.example.myapp;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -18,11 +23,12 @@ import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class DisplayDirectoryActivity extends Activity implements MultiChoiceModeListener {
 
 	ArrayList<String> currentFileList = new ArrayList<String>();
-	List<View> selected = new ArrayList<View>();
+	List<String> selectedPaths = new ArrayList<String>();
 	String path;
 	String query;
 
@@ -40,7 +46,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		String currentPath = (String) getIntent().getCharSequenceExtra("currentPath");
 		path = currentPath;
 
-		// Add all directories on external SD card to List->Map for display in listView
+		//Run initialiation methods
 		populateFiles();
 		setupListViewMulti();
 		setupAdapter();
@@ -55,38 +61,37 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 	}
 	
 	public void populateFiles() {
-		// Clear list for updating
+		// Clear current file list for updating
 		currentFileList.clear();
 		// Create a file from the current path
 		File current = new File(path);
 		// Array of the files within the current directory
 		File[] subFiles = current.listFiles();
-		// Add each file in the current directory to currentFileList
+		// Add each filepath in the current directory to currentFileList
 		for (int i = 0; i < subFiles.length; i++) {
 			currentFileList.add(subFiles[i].getPath());
 		}
 	}
 	
 	public void setupListViewMulti() {
-	// Create ListView attached to ListView in xml definition
+	// Find the listview
 	lv = (ListView) findViewById(R.id.listView);
 
 	// Set listview to multiple selection mode
 	lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-
 	lv.setMultiChoiceModeListener(this);
 	}
 		
 	
 	public void setupAdapter() {
-		// Create a new adapter with the files needed to be listed
+		// Create a new adapter with the context, row layout, textview id tag and the current files
 		mAdapter = new SelectionAdapter(getBaseContext(), R.layout.row_list_item, R.id.file, currentFileList);
 		// Set the new adapter to the ListView
 		lv.setAdapter(mAdapter);
 	}
 
 	private void setupListClick() {
-		// Set up the ListView to accept clicking on items
+		//Create onClickListener to allow action of clicking listview items
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> parentAdapter, View view,
@@ -94,20 +99,19 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 				// View is a text view so it can be cast
 				TextView clickedItem = (TextView) view.findViewById(R.id.file);
 
-				// Update path and listview to new directory based on what was
-				// clicked
+				// Update path and listview to new directory based on what was clicked
 				path += "/" + clickedItem.getText();
-
+				
+				// Create a new file from the updated path and check if it is a directory or file
 				File currentFile = new File(path);
-				// Create a new file from the updated path and check if it is a
-				// directory or file
+				
 				if (currentFile.isDirectory()) {
 					populateFiles();
 					mAdapter.notifyDataSetChanged();
 					}
 
 				else if (currentFile.isFile()) {
-					// Create new intent and set it
+					// Create new intent and set it's action to ACTION_VIEW
 					Intent intent = new Intent();
 					intent.setAction(android.content.Intent.ACTION_VIEW);
 
@@ -153,21 +157,41 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	@Override
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+		//Switch based on menu option clicked
 		switch (item.getItemId()) {
 		case R.id.context_delete:
+			selectedPaths = mAdapter.getCurrentPaths();
+			for (int i = 0; i < selectedPaths.size(); i++){
+				File f = new File(selectedPaths.get(i));
+				f.getAbsoluteFile().delete();
+				mAdapter.remove(selectedPaths.get(i));
+				mAdapter.notifyDataSetChanged();
+			}
+			Toast.makeText(getBaseContext(), "Delete successful", Toast.LENGTH_SHORT).show();
+			mode.finish(); // Action picked, so close the CAB
+			return true;
+		case R.id.context_copy:
+			Toast.makeText(getBaseContext(), "Copy successful", Toast.LENGTH_LONG).show();
+			mode.finish(); // Action picked, so close the CAB
+			return true;
+		case R.id.context_cut:
+			Toast.makeText(getBaseContext(), "Cut successful", Toast.LENGTH_LONG).show();
 			mode.finish(); // Action picked, so close the CAB
 			return true;
 		default:
 			return false;
-
 		}
 	}
 
 	@Override
 	public void onItemCheckedStateChanged(ActionMode mode,int position, long id, boolean checked) {
 		if (checked){
-			mAdapter.setNewSelection(position, true);;
+			String path = mAdapter.getItem(position);
+			Log.e(path, "path");
+			mAdapter.setNewSelection(path, position, true);
 		}
+		else if (!checked)
+			mAdapter.removeSelection(position);
 	}
 	
 	// Override back button to move up one level in the filesystem on press

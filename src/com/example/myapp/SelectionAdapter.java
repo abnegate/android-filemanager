@@ -3,6 +3,7 @@ package com.example.myapp;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import android.content.Context;
@@ -18,7 +19,8 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 
 	private SparseBooleanArray mSelection = new SparseBooleanArray();
 	private final Context context;
-	private ArrayList<String> values;
+	private List<String> values;
+	private List<String> paths = new ArrayList<String>();
 
 	public SelectionAdapter(Context context, int resource,
 			int textViewResourceId, ArrayList<String> values) {
@@ -27,7 +29,8 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 		this.values = values;
 	}
 
-	public void setNewSelection(int position, boolean value) {
+	public void setNewSelection(String path, int position, boolean value) {
+		paths.add(path);
 		mSelection.put(position, value);
 		notifyDataSetChanged();
 	}
@@ -37,10 +40,18 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 		return result == null ? false : result;
 	}
 
-	public Set<Integer> getCurrentCheckedPosition() {
-		Set<Integer> current = new HashSet<Integer>();
+	public List<Integer> getCurrentCheckedPositions() {
+		List<Integer> current = new ArrayList<Integer>();
 		for (int i = 0; i < mSelection.size(); i++) {
 			current.add(mSelection.keyAt(i));
+		}
+		return current;
+	}
+	
+	public List<String> getCurrentPaths() {
+		List<String> current = new ArrayList<String>();
+		for (int i = 0; i < paths.size(); i++) {
+			current.add(paths.get(i));
 		}
 		return current;
 	}
