@@ -1,12 +1,8 @@
 package com.example.myapp;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
