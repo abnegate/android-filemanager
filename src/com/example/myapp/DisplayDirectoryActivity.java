@@ -167,6 +167,10 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			mode.finish(); // Action picked, so close the CAB
 			return true;
 		case R.id.context_copy:
+			for (int i = 0; i < selectedPaths.size(); i++){
+				File f = new File(selectedPaths.get(i));
+				
+			}
 			Toast.makeText(getBaseContext(), "Copy successful", Toast.LENGTH_LONG).show();
 			mode.finish(); // Action picked, so close the CAB
 			return true;
@@ -193,7 +197,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 	// Override back button to move up one level in the filesystem on press
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (path.length() > 5) {
+		if (path.length() > 7) {
 			if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 				File currentDirectory = new File(path);
 				path = currentDirectory.getParent();

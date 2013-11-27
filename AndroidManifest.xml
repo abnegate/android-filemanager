@@ -32,7 +32,8 @@
         <activity
             android:name="com.example.myapp.DisplayDirectoryActivity"
             android:label="@string/display_directory_activity_title"
-            android:parentActivityName="com.example.myapp.MainActivity" >
+            android:parentActivityName="com.example.myapp.MainActivity"
+            android:uiOptions="splitActionBarWhenNarrow" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.myapp.MainActivity" />

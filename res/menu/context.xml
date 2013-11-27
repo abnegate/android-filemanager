@@ -5,7 +5,7 @@
         <item
             android:id="@+id/context_copy"
             android:icon="@drawable/ic_menu_copy_holo_dark"
-            android:showAsAction="always"
+            android:showAsAction="always|withText"
             android:title="@string/context_copy"
             android:paddingLeft="20dp"/>
         <item
