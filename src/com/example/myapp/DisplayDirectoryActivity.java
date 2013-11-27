@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,8 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DisplayDirectoryActivity extends Activity implements
-		MultiChoiceModeListener {
+public class DisplayDirectoryActivity extends Activity implements MultiChoiceModeListener {
 
 	ArrayList<String> currentFileList = new ArrayList<String>();
 	List<String> selectedPaths = new ArrayList<String>();
@@ -92,8 +92,7 @@ public class DisplayDirectoryActivity extends Activity implements
 	public void setupAdapter() {
 		// Create a new adapter with the context, row layout, textview id tag
 		// and the current files
-		mAdapter = new SelectionAdapter(getBaseContext(),
-				R.layout.row_list_item, R.id.file, currentFileList);
+		mAdapter = new SelectionAdapter(getBaseContext(), R.layout.row_list_item, R.id.file, currentFileList);
 		// Set the new adapter to the ListView
 		lv.setAdapter(mAdapter);
 	}
@@ -102,8 +101,7 @@ public class DisplayDirectoryActivity extends Activity implements
 		// Create onClickListener to allow action of clicking listview items
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-			public void onItemClick(AdapterView<?> parentAdapter, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parentAdapter, View view, int position, long id) {
 				// View is a text view so it can be cast
 				TextView clickedItem = (TextView) view.findViewById(R.id.file);
 
@@ -127,8 +125,7 @@ public class DisplayDirectoryActivity extends Activity implements
 
 					// Get extension type of file
 					MimeTypeMap mime = MimeTypeMap.getSingleton();
-					String ext = currentFile.getName().substring(
-							currentFile.getName().indexOf(".") + 1);
+					String ext = currentFile.getName().substring(currentFile.getName().indexOf(".") + 1);
 					String type = mime.getMimeTypeFromExtension(ext);
 
 					// Give intent the filename and extension
@@ -147,8 +144,7 @@ public class DisplayDirectoryActivity extends Activity implements
 
 	}
 
-	public void copyDirectory(File sourceLocation, File targetLocation, boolean cut)
-			throws IOException {
+	public void copyDirectory(File sourceLocation, File targetLocation, boolean cut) throws IOException {
 		if (sourceLocation.isDirectory() && sourceLocation.exists()) {
 			if (!targetLocation.exists()) {
 				targetLocation.mkdir();
@@ -156,8 +152,7 @@ public class DisplayDirectoryActivity extends Activity implements
 
 			String[] children = sourceLocation.list();
 			for (int i = 0; i < children.length; i++) {
-				copyDirectory(new File(sourceLocation, children[i]), new File(
-						targetLocation, children[i]), cut);
+				copyDirectory(new File(sourceLocation, children[i]), new File(targetLocation, children[i]), cut);
 			}
 		} else {
 
@@ -167,7 +162,7 @@ public class DisplayDirectoryActivity extends Activity implements
 			// Copy the bits from instream to outstream
 			byte[] buf = new byte[1024];
 			int len;
-			while ((len = in.read(buf)) > 0) { 
+			while ((len = in.read(buf)) > 0) {
 				out.write(buf, 0, len);
 			}
 			in.close();
@@ -180,25 +175,22 @@ public class DisplayDirectoryActivity extends Activity implements
 			sourceLocation.delete();
 		}
 	}
-	
-	void DeleteRecursive(File fileOrDirectory) {
-	    if (fileOrDirectory.isDirectory())
-	        for (File child : fileOrDirectory.listFiles())
-	            DeleteRecursive(child);
 
-	    fileOrDirectory.delete();
+	void DeleteRecursive(File fileOrDirectory) {
+		if (fileOrDirectory.isDirectory())
+			for (File child : fileOrDirectory.listFiles())
+				DeleteRecursive(child);
+
+		fileOrDirectory.delete();
 	}
 
 	@Override
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 		if (itemsMoving) {
 			menu.clear();
-			menu.add(Menu.NONE, R.id.context_cancel_paste, Menu.FIRST, "Cancel")
-					.setIcon(R.drawable.ic_action_cancel);
-			menu.add(Menu.NONE, Menu.NONE, Menu.FIRST + 1, "Moving " + numMoving
-					+ " items");
-			menu.add(Menu.NONE, R.id.context_accept_paste, Menu.FIRST + 2,
-					"PASTE").setIcon(R.drawable.ic_action_paste);
+			menu.add(Menu.NONE, R.id.context_cancel_paste, Menu.FIRST, "Cancel").setIcon(R.drawable.ic_action_cancel);
+			menu.add(Menu.NONE, Menu.NONE, Menu.FIRST + 1, "Moving " + numMoving + " items");
+			menu.add(Menu.NONE, R.id.context_accept_paste, Menu.FIRST + 2, "PASTE").setIcon(R.drawable.ic_action_paste);
 			return true;
 		} else {
 			menu.removeItem(R.id.context_accept_paste);
@@ -252,7 +244,7 @@ public class DisplayDirectoryActivity extends Activity implements
 			mode.invalidate();
 			mAdapter.clearSelection();
 			return true;
-			
+
 		case R.id.context_cut:
 			cut = true;
 			itemsMoving = true;
@@ -261,17 +253,14 @@ public class DisplayDirectoryActivity extends Activity implements
 			for (int i = 0; i < selectedPaths.size(); i++) {
 				filesMoving.add(new File(selectedPaths.get(i)));
 			}
-			mode.setTitle("Copying..");
+			mode.setTitle("Cutting..");
 			mode.invalidate();
 			mAdapter.clearSelection();
 			cut = false;
 			return true;
-			
-		case R.id.context_cancel_paste:
-			mode.finish();
-			return true;
 
 		case R.id.context_accept_paste:
+			ProgressDialog.show(getBaseContext(), "Moving files", "1 of 3 files done..");
 			for (int i = 0; i < numMoving; i++) {
 				try {
 					destination = new File(path + "/" + filesMoving.get(i).getName());
@@ -282,9 +271,13 @@ public class DisplayDirectoryActivity extends Activity implements
 				}
 				selectedPaths.clear();
 			}
-			Toast.makeText(getBaseContext(), "Paste successful",Toast.LENGTH_SHORT).show();
+			Toast.makeText(getBaseContext(), "Paste successful", Toast.LENGTH_SHORT).show();
 			mAdapter.notifyDataSetChanged();
 			mode.finish(); // Action picked, so close the CAB
+			return true;
+
+		case R.id.context_cancel_paste:
+			mode.finish();
 			return true;
 		default:
 			return false;
@@ -292,8 +285,7 @@ public class DisplayDirectoryActivity extends Activity implements
 	}
 
 	@Override
-	public void onItemCheckedStateChanged(ActionMode mode, int position,
-			long id, boolean checked) {
+	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
 		if (!itemsMoving) {
 			if (checked) {
 				String path = mAdapter.getItem(position);
@@ -308,15 +300,15 @@ public class DisplayDirectoryActivity extends Activity implements
 			mode.invalidate();
 		}
 		if (itemsMoving) {
-			String clickedItem =  mAdapter.getItem(position);
+			String clickedItem = mAdapter.getItem(position);
 			// Update path and listview to new directory based on what was
 			// clicked
 			path = clickedItem;
 			populateFiles();
 			mAdapter.notifyDataSetChanged();
 			mode.invalidate();
-			}
 		}
+	}
 
 	// Override back button to move up one level in the filesystem on press
 	@Override
