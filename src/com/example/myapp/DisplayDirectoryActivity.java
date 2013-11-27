@@ -9,8 +9,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -51,8 +49,7 @@ public class DisplayDirectoryActivity extends Activity implements
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Receive current directory path
-		String currentPath = (String) getIntent().getCharSequenceExtra(
-				"currentPath");
+		String currentPath = (String) getIntent().getCharSequenceExtra("currentPath");
 		path = currentPath;
 
 		// Run initialiation methods
@@ -187,12 +184,14 @@ public class DisplayDirectoryActivity extends Activity implements
 			menu.clear();
 			menu.add(Menu.NONE, R.id.context_cancel_paste, Menu.FIRST, "Cancel")
 					.setIcon(R.drawable.ic_action_cancel);
-			menu.add(Menu.NONE, 0, Menu.FIRST + 1, "Moving " + numMoving
+			menu.add(Menu.NONE, R.id.context_accept_paste, Menu.FIRST + 1, "Moving " + numMoving
 					+ " items");
-			menu.add(Menu.NONE, R.id.context_accept_paste, Menu.FIRST + 2,
+			menu.add(Menu.NONE, Menu.NONE, Menu.FIRST + 2,
 					"PASTE").setIcon(R.drawable.ic_action_paste);
 			return true;
 		} else {
+			menu.removeItem(R.id.context_accept_paste);
+			menu.removeItem(R.id.context_cancel_paste);
 			return true;
 		}
 	}
@@ -200,9 +199,9 @@ public class DisplayDirectoryActivity extends Activity implements
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
 		mAdapter.clearSelection();
-		itemsMoving = false;
 		filesMoving.clear();
 		selectedPaths.clear();
+		itemsMoving = false;
 		numMoving = 0;
 		mode.invalidate();
 	}

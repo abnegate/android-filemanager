@@ -32,6 +32,7 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 		mSelection.put(position, value);
 		notifyDataSetChanged();
 	}
+	
 
 	public boolean isPositionChecked(int position) {
 		Boolean result = mSelection.get(position);
@@ -61,6 +62,7 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 	}
 
 	public void clearSelection() {
+		paths = new ArrayList<String>();
 		mSelection = new SparseBooleanArray();
 		notifyDataSetChanged();
 	}
