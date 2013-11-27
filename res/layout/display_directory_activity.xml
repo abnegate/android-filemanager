@@ -8,14 +8,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".DisplayDirectoryActivity" >
 
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+    <GridView
+        android:id="@+id/gridView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:choiceMode="multipleChoice"
-        android:listSelector="@android:color/darker_gray">
-    </ListView>
+        android:columnWidth="90dp"
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:listSelector="@android:color/darker_gray"
+        android:numColumns="auto_fit"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" >
+
+    </GridView>
 
 </RelativeLayout>

@@ -13,8 +13,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -24,6 +22,7 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +39,7 @@ public class DisplayDirectoryActivity extends Activity implements
 	boolean cut = false;
 	int numMoving = 0;
 
-	ListView lv;
+	GridView lv;
 	SelectionAdapter mAdapter;
 
 	@Override
@@ -83,7 +82,7 @@ public class DisplayDirectoryActivity extends Activity implements
 
 	public void setupListViewMulti() {
 		// Find the listview
-		lv = (ListView) findViewById(R.id.listView);
+		lv = (GridView) findViewById(R.id.gridView);
 
 		// Set listview to multiple selection mode
 		lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);

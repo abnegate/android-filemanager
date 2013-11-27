@@ -50,8 +50,7 @@ public class MainActivity extends Activity {
 	// Display contents of internal sdcard
 	public void openInternal(View view) {
 		Intent intent = new Intent(this, DisplayDirectoryActivity.class);
-		intent.putExtra("currentPath", Environment
-				.getExternalStorageDirectory().getPath());
+		intent.putExtra("currentPath", Environment.getExternalStorageDirectory().getPath());
 		startActivity(intent);
 	}
 
