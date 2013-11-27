@@ -55,6 +55,7 @@ final class SelectionAdapter extends ArrayAdapter<String> {
 	}
 
 	public void removeSelection(int position) {
+		paths.remove(this.getItem(position));
 		mSelection.delete(position);
 		notifyDataSetChanged();
 	}

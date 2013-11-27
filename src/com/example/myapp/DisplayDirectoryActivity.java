@@ -36,7 +36,6 @@ public class DisplayDirectoryActivity extends Activity implements
 	List<String> selectedPaths = new ArrayList<String>();
 	List<File> filesMoving = new ArrayList<File>();
 	String path;
-	String query;
 	File destination;
 	boolean itemsMoving = false;
 	int numMoving = 0;
@@ -152,7 +151,7 @@ public class DisplayDirectoryActivity extends Activity implements
 
 	public void copyDirectory(File sourceLocation, File targetLocation)
 			throws IOException {
-
+		if (!sourceLocation.exists()) Log.e("file doesnt exist", "file");
 		if (sourceLocation.isDirectory()) {
 			if (!targetLocation.exists()) {
 				targetLocation.mkdir();
@@ -171,11 +170,14 @@ public class DisplayDirectoryActivity extends Activity implements
 			// Copy the bits from instream to outstream
 			byte[] buf = new byte[1024];
 			int len;
-			while ((len = in.read(buf)) > 0) {
+			while ((len = in.read(buf)) > 0) { 
 				out.write(buf, 0, len);
 			}
 			in.close();
+			in = null;
+			out.flush();
 			out.close();
+			out = null;
 		}
 	}
 
@@ -199,7 +201,10 @@ public class DisplayDirectoryActivity extends Activity implements
 	public void onDestroyActionMode(ActionMode mode) {
 		mAdapter.clearSelection();
 		itemsMoving = false;
+		filesMoving.clear();
+		selectedPaths.clear();
 		numMoving = 0;
+		mode.invalidate();
 	}
 
 	@Override
@@ -216,8 +221,9 @@ public class DisplayDirectoryActivity extends Activity implements
 		case R.id.context_delete:
 			selectedPaths = mAdapter.getCurrentPaths();
 			for (int i = 0; i < selectedPaths.size(); i++) {
+				Log.e(selectedPaths.get(i), "selected files");
 				File f = new File(selectedPaths.get(i));
-				f.getAbsoluteFile().delete();
+				f.delete();
 				mAdapter.remove(selectedPaths.get(i));
 				mAdapter.notifyDataSetChanged();
 			}
@@ -232,26 +238,26 @@ public class DisplayDirectoryActivity extends Activity implements
 			selectedPaths = mAdapter.getCurrentPaths();
 			numMoving = selectedPaths.size();
 			for (int i = 0; i < selectedPaths.size(); i++) {
-				File f = new File(selectedPaths.get(i));
-				filesMoving.add(f);
+				filesMoving.add(new File(selectedPaths.get(i)));
 			}
 			mode.setTitle("Copying..");
 			mode.invalidate();
 			mAdapter.clearSelection();
 			return true;
 
-		case R.id.context_paste:
-			destination = new File(path);
+		case R.id.context_accept_paste:
 			for (int i = 0; i < numMoving; i++) {
 				try {
-					copyDirectory(filesMoving.get(i), destination);
-					filesMoving.clear();
+					destination = new File(path + "/" + filesMoving.get(i).getName());
+					copyDirectory(filesMoving.get(i).getAbsoluteFile(), destination);
+					currentFileList.add(path + "/" + filesMoving.get(i).getName());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				selectedPaths.clear();
 			}
-			Toast.makeText(getBaseContext(), "Paste successful",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(getBaseContext(), "Paste successful",Toast.LENGTH_SHORT).show();
+			mAdapter.notifyDataSetChanged();
 			mode.finish(); // Action picked, so close the CAB
 			return true;
 		default:
@@ -268,7 +274,6 @@ public class DisplayDirectoryActivity extends Activity implements
 				numMoving++;
 				mAdapter.setNewSelection(path, position, true);
 				mode.setTitle(numMoving + " items selected");
-				mode.invalidate();
 			} else if (!checked) {
 				numMoving--;
 				mAdapter.removeSelection(position);
@@ -277,9 +282,15 @@ public class DisplayDirectoryActivity extends Activity implements
 			mode.invalidate();
 		}
 		if (itemsMoving) {
-			
+			String clickedItem =  mAdapter.getItem(position);
+			// Update path and listview to new directory based on what was
+			// clicked
+			path = clickedItem;
+			populateFiles();
+			mAdapter.notifyDataSetChanged();
+			mode.invalidate();
+			}
 		}
-	}
 
 	// Override back button to move up one level in the filesystem on press
 	@Override
