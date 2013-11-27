@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -36,6 +37,7 @@ public class DisplayDirectoryActivity extends Activity implements
 	String path;
 	File destination;
 	boolean itemsMoving = false;
+	boolean cut = false;
 	int numMoving = 0;
 
 	ListView lv;
@@ -146,10 +148,9 @@ public class DisplayDirectoryActivity extends Activity implements
 
 	}
 
-	public void copyDirectory(File sourceLocation, File targetLocation)
+	public void copyDirectory(File sourceLocation, File targetLocation, boolean cut)
 			throws IOException {
-		if (!sourceLocation.exists()) Log.e("file doesnt exist", "file");
-		if (sourceLocation.isDirectory()) {
+		if (sourceLocation.isDirectory() && sourceLocation.exists()) {
 			if (!targetLocation.exists()) {
 				targetLocation.mkdir();
 			}
@@ -157,7 +158,7 @@ public class DisplayDirectoryActivity extends Activity implements
 			String[] children = sourceLocation.list();
 			for (int i = 0; i < children.length; i++) {
 				copyDirectory(new File(sourceLocation, children[i]), new File(
-						targetLocation, children[i]));
+						targetLocation, children[i]), cut);
 			}
 		} else {
 
@@ -176,6 +177,17 @@ public class DisplayDirectoryActivity extends Activity implements
 			out.close();
 			out = null;
 		}
+		if (cut) {
+			sourceLocation.delete();
+		}
+	}
+	
+	void DeleteRecursive(File fileOrDirectory) {
+	    if (fileOrDirectory.isDirectory())
+	        for (File child : fileOrDirectory.listFiles())
+	            DeleteRecursive(child);
+
+	    fileOrDirectory.delete();
 	}
 
 	@Override
@@ -220,15 +232,13 @@ public class DisplayDirectoryActivity extends Activity implements
 		case R.id.context_delete:
 			selectedPaths = mAdapter.getCurrentPaths();
 			for (int i = 0; i < selectedPaths.size(); i++) {
-				Log.e(selectedPaths.get(i), "selected files");
 				File f = new File(selectedPaths.get(i));
-				f.delete();
+				DeleteRecursive(f);
 				mAdapter.remove(selectedPaths.get(i));
 				mAdapter.notifyDataSetChanged();
 			}
 			selectedPaths.clear();
-			Toast.makeText(getBaseContext(), "Delete successful",
-					Toast.LENGTH_SHORT).show();
+			Toast.makeText(getBaseContext(), "Delete successful", Toast.LENGTH_SHORT).show();
 			mode.finish(); // Action picked, so close the CAB
 			return true;
 
@@ -243,12 +253,30 @@ public class DisplayDirectoryActivity extends Activity implements
 			mode.invalidate();
 			mAdapter.clearSelection();
 			return true;
+			
+		case R.id.context_cut:
+			cut = true;
+			itemsMoving = true;
+			selectedPaths = mAdapter.getCurrentPaths();
+			numMoving = selectedPaths.size();
+			for (int i = 0; i < selectedPaths.size(); i++) {
+				filesMoving.add(new File(selectedPaths.get(i)));
+			}
+			mode.setTitle("Copying..");
+			mode.invalidate();
+			mAdapter.clearSelection();
+			cut = false;
+			return true;
+			
+		case R.id.context_cancel_paste:
+			mode.finish();
+			return true;
 
 		case R.id.context_accept_paste:
 			for (int i = 0; i < numMoving; i++) {
 				try {
 					destination = new File(path + "/" + filesMoving.get(i).getName());
-					copyDirectory(filesMoving.get(i).getAbsoluteFile(), destination);
+					copyDirectory(filesMoving.get(i).getAbsoluteFile(), destination, cut);
 					currentFileList.add(path + "/" + filesMoving.get(i).getName());
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -294,7 +322,7 @@ public class DisplayDirectoryActivity extends Activity implements
 	// Override back button to move up one level in the filesystem on press
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (path.length() > 7) {
+		if (path.length() > 15) {
 			if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
 				File currentDirectory = new File(path);
 				path = currentDirectory.getParent();
