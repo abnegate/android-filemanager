@@ -32,12 +32,12 @@
         <item
             android:id="@+id/context_accept_paste"
             android:icon="@drawable/ic_action_done"
-            android:showAsAction="always"
+            android:showAsAction="never"
             android:paddingRight="20dp" />
         <item
             android:id="@+id/context_cancel_paste"
             android:icon="@drawable/ic_action_cancel"
-            android:showAsAction="always"
+            android:showAsAction="never"
             android:paddingLeft="20dp" />
     </group>
 

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -149,28 +150,56 @@ public class DisplayDirectoryActivity extends Activity implements
 
 	}
 
+	public void copyDirectory(File sourceLocation, File targetLocation)
+			throws IOException {
+
+		if (sourceLocation.isDirectory()) {
+			if (!targetLocation.exists()) {
+				targetLocation.mkdir();
+			}
+
+			String[] children = sourceLocation.list();
+			for (int i = 0; i < children.length; i++) {
+				copyDirectory(new File(sourceLocation, children[i]), new File(
+						targetLocation, children[i]));
+			}
+		} else {
+
+			InputStream in = new FileInputStream(sourceLocation);
+			OutputStream out = new FileOutputStream(targetLocation);
+
+			// Copy the bits from instream to outstream
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		}
+	}
+
 	@Override
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 		if (itemsMoving) {
 			menu.clear();
-			menu.add("Moving " + numMoving + " files");
-			MenuItem item1 = menu.findItem(R.id.context_accept_paste);
-			MenuItem item2 = menu.findItem(R.id.context_cancel_paste);
-			item1.setVisible(true);
-			item2.setVisible(true);
+			menu.add(Menu.NONE, R.id.context_cancel_paste, Menu.FIRST, "Cancel")
+					.setIcon(R.drawable.ic_action_cancel);
+			menu.add(Menu.NONE, 0, Menu.FIRST + 1, "Moving " + numMoving
+					+ " items");
+			menu.add(Menu.NONE, R.id.context_accept_paste, Menu.FIRST + 2,
+					"PASTE").setIcon(R.drawable.ic_action_paste);
 			return true;
 		} else {
-			MenuItem item1 = menu.findItem(R.id.context_accept_paste);
-			MenuItem item2 = menu.findItem(R.id.context_cancel_paste);
-			item1.setVisible(false);
-			item2.setVisible(false);
+			return true;
 		}
-		return false;
 	}
 
 	@Override
 	public void onDestroyActionMode(ActionMode mode) {
 		mAdapter.clearSelection();
+		itemsMoving = false;
+		numMoving = 0;
 	}
 
 	@Override
@@ -206,9 +235,9 @@ public class DisplayDirectoryActivity extends Activity implements
 				File f = new File(selectedPaths.get(i));
 				filesMoving.add(f);
 			}
+			mode.setTitle("Copying..");
 			mode.invalidate();
-			Toast.makeText(getBaseContext(), "Copy successful",
-					Toast.LENGTH_SHORT).show();
+			mAdapter.clearSelection();
 			return true;
 
 		case R.id.context_paste:
@@ -236,12 +265,19 @@ public class DisplayDirectoryActivity extends Activity implements
 		if (!itemsMoving) {
 			if (checked) {
 				String path = mAdapter.getItem(position);
-				mAdapter.setNewSelection(path, position, true);
 				numMoving++;
+				mAdapter.setNewSelection(path, position, true);
 				mode.setTitle(numMoving + " items selected");
 				mode.invalidate();
-			} else if (!checked)
+			} else if (!checked) {
+				numMoving--;
 				mAdapter.removeSelection(position);
+			}
+			mode.setTitle(numMoving + " items selected");
+			mode.invalidate();
+		}
+		if (itemsMoving) {
+			
 		}
 	}
 
@@ -262,33 +298,21 @@ public class DisplayDirectoryActivity extends Activity implements
 		return super.onKeyDown(keyCode, event);
 	}
 
-	public void copyDirectory(File sourceLocation, File targetLocation)
-			throws IOException {
-
-		if (sourceLocation.isDirectory()) {
-			if (!targetLocation.exists()) {
-				targetLocation.mkdir();
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		if (itemsMoving) {
+			if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
+				File currentDirectory = new File(path);
+				path = currentDirectory.getParent();
+				populateFiles();
+				mAdapter.notifyDataSetChanged();
+				return true;
 			}
-
-			String[] children = sourceLocation.list();
-			for (int i = 0; i < children.length; i++) {
-				copyDirectory(new File(sourceLocation, children[i]), new File(
-						targetLocation, children[i]));
-			}
-		} else {
-
-			InputStream in = new FileInputStream(sourceLocation);
-			OutputStream out = new FileOutputStream(targetLocation);
-
-			// Copy the bits from instream to outstream
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-			in.close();
-			out.close();
+			return true; // consumes the back key event - ActionMode is not
+							// finished
 		}
+
+		return super.dispatchKeyEvent(event);
 	}
 
 }
