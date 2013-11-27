@@ -184,9 +184,9 @@ public class DisplayDirectoryActivity extends Activity implements
 			menu.clear();
 			menu.add(Menu.NONE, R.id.context_cancel_paste, Menu.FIRST, "Cancel")
 					.setIcon(R.drawable.ic_action_cancel);
-			menu.add(Menu.NONE, R.id.context_accept_paste, Menu.FIRST + 1, "Moving " + numMoving
+			menu.add(Menu.NONE, Menu.NONE, Menu.FIRST + 1, "Moving " + numMoving
 					+ " items");
-			menu.add(Menu.NONE, Menu.NONE, Menu.FIRST + 2,
+			menu.add(Menu.NONE, R.id.context_accept_paste, Menu.FIRST + 2,
 					"PASTE").setIcon(R.drawable.ic_action_paste);
 			return true;
 		} else {
