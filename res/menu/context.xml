@@ -4,31 +4,41 @@
     <group>
         <item
             android:id="@+id/context_copy"
-            android:icon="@drawable/ic_menu_copy_holo_dark"
+            android:icon="@drawable/ic_action_copy"
             android:showAsAction="always|withText"
             android:title="@string/context_copy"
             android:paddingLeft="20dp"/>
         <item
             android:id="@+id/context_cut"
-            android:icon="@drawable/ic_menu_cut_holo_dark"
+            android:icon="@drawable/ic_action_cut"
             android:showAsAction="always"
             android:title="@string/context_cut"/>
         <item
             android:id="@+id/context_paste"
-            android:icon="@drawable/ic_menu_paste_holo_dark"
+            android:icon="@drawable/ic_action_paste"
             android:showAsAction="always"
             android:title="@string/context_paste"/>
         <item
             android:id="@+id/context_delete"
-            android:icon="@drawable/ic_menu_delete"
+            android:icon="@drawable/ic_action_discard"
             android:showAsAction="always"
             android:title="@string/context_delete"/>
         <item
             android:id="@+id/context_properties"
-            android:icon="@drawable/ic_menu_preferences"
+            android:icon="@drawable/ic_action_copy"
             android:showAsAction="ifRoom"
             android:title="@string/context_properties"
             android:paddingRight="20dp"/>
+        <item
+            android:id="@+id/context_accept_paste"
+            android:icon="@drawable/ic_action_done"
+            android:showAsAction="always"
+            android:paddingRight="20dp" />
+        <item
+            android:id="@+id/context_cancel_paste"
+            android:icon="@drawable/ic_action_cancel"
+            android:showAsAction="always"
+            android:paddingLeft="20dp" />
     </group>
 
 </menu>

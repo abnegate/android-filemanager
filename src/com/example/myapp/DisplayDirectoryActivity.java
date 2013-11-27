@@ -1,8 +1,15 @@
 package com.example.myapp;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -21,12 +28,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DisplayDirectoryActivity extends Activity implements MultiChoiceModeListener {
+public class DisplayDirectoryActivity extends Activity implements
+		MultiChoiceModeListener {
 
 	ArrayList<String> currentFileList = new ArrayList<String>();
 	List<String> selectedPaths = new ArrayList<String>();
+	List<File> filesMoving = new ArrayList<File>();
 	String path;
 	String query;
+	File destination;
+	boolean itemsMoving = false;
+	int numMoving = 0;
 
 	ListView lv;
 	SelectionAdapter mAdapter;
@@ -39,23 +51,24 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// Receive current directory path
-		String currentPath = (String) getIntent().getCharSequenceExtra("currentPath");
+		String currentPath = (String) getIntent().getCharSequenceExtra(
+				"currentPath");
 		path = currentPath;
 
-		//Run initialiation methods
+		// Run initialiation methods
 		populateFiles();
 		setupListViewMulti();
 		setupAdapter();
 		setupListClick();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main_activity_actions, menu);
 		return true;
 	}
-	
+
 	public void populateFiles() {
 		// Clear current file list for updating
 		currentFileList.clear();
@@ -68,26 +81,27 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			currentFileList.add(subFiles[i].getPath());
 		}
 	}
-	
-	public void setupListViewMulti() {
-	// Find the listview
-	lv = (ListView) findViewById(R.id.listView);
 
-	// Set listview to multiple selection mode
-	lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-	lv.setMultiChoiceModeListener(this);
+	public void setupListViewMulti() {
+		// Find the listview
+		lv = (ListView) findViewById(R.id.listView);
+
+		// Set listview to multiple selection mode
+		lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		lv.setMultiChoiceModeListener(this);
 	}
-		
-	
+
 	public void setupAdapter() {
-		// Create a new adapter with the context, row layout, textview id tag and the current files
-		mAdapter = new SelectionAdapter(getBaseContext(), R.layout.row_list_item, R.id.file, currentFileList);
+		// Create a new adapter with the context, row layout, textview id tag
+		// and the current files
+		mAdapter = new SelectionAdapter(getBaseContext(),
+				R.layout.row_list_item, R.id.file, currentFileList);
 		// Set the new adapter to the ListView
 		lv.setAdapter(mAdapter);
 	}
 
 	private void setupListClick() {
-		//Create onClickListener to allow action of clicking listview items
+		// Create onClickListener to allow action of clicking listview items
 		lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> parentAdapter, View view,
@@ -95,16 +109,18 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 				// View is a text view so it can be cast
 				TextView clickedItem = (TextView) view.findViewById(R.id.file);
 
-				// Update path and listview to new directory based on what was clicked
+				// Update path and listview to new directory based on what was
+				// clicked
 				path += "/" + clickedItem.getText();
-				
-				// Create a new file from the updated path and check if it is a directory or file
+
+				// Create a new file from the updated path and check if it is a
+				// directory or file
 				File currentFile = new File(path);
-				
+
 				if (currentFile.isDirectory()) {
 					populateFiles();
 					mAdapter.notifyDataSetChanged();
-					}
+				}
 
 				else if (currentFile.isFile()) {
 					// Create new intent and set it's action to ACTION_VIEW
@@ -132,10 +148,23 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		});
 
 	}
-	
+
 	@Override
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-		// TODO Auto-generated method stub
+		if (itemsMoving) {
+			menu.clear();
+			menu.add("Moving " + numMoving + " files");
+			MenuItem item1 = menu.findItem(R.id.context_accept_paste);
+			MenuItem item2 = menu.findItem(R.id.context_cancel_paste);
+			item1.setVisible(true);
+			item2.setVisible(true);
+			return true;
+		} else {
+			MenuItem item1 = menu.findItem(R.id.context_accept_paste);
+			MenuItem item2 = menu.findItem(R.id.context_cancel_paste);
+			item1.setVisible(false);
+			item2.setVisible(false);
+		}
 		return false;
 	}
 
@@ -153,29 +182,47 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	@Override
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-		//Switch based on menu option clicked
+		// Switch based on menu option clicked
 		switch (item.getItemId()) {
 		case R.id.context_delete:
 			selectedPaths = mAdapter.getCurrentPaths();
-			for (int i = 0; i < selectedPaths.size(); i++){
+			for (int i = 0; i < selectedPaths.size(); i++) {
 				File f = new File(selectedPaths.get(i));
 				f.getAbsoluteFile().delete();
 				mAdapter.remove(selectedPaths.get(i));
 				mAdapter.notifyDataSetChanged();
 			}
-			Toast.makeText(getBaseContext(), "Delete successful", Toast.LENGTH_SHORT).show();
+			selectedPaths.clear();
+			Toast.makeText(getBaseContext(), "Delete successful",
+					Toast.LENGTH_SHORT).show();
 			mode.finish(); // Action picked, so close the CAB
 			return true;
+
 		case R.id.context_copy:
-			for (int i = 0; i < selectedPaths.size(); i++){
+			itemsMoving = true;
+			selectedPaths = mAdapter.getCurrentPaths();
+			numMoving = selectedPaths.size();
+			for (int i = 0; i < selectedPaths.size(); i++) {
 				File f = new File(selectedPaths.get(i));
-				
+				filesMoving.add(f);
 			}
-			Toast.makeText(getBaseContext(), "Copy successful", Toast.LENGTH_LONG).show();
-			mode.finish(); // Action picked, so close the CAB
+			mode.invalidate();
+			Toast.makeText(getBaseContext(), "Copy successful",
+					Toast.LENGTH_SHORT).show();
 			return true;
-		case R.id.context_cut:
-			Toast.makeText(getBaseContext(), "Cut successful", Toast.LENGTH_LONG).show();
+
+		case R.id.context_paste:
+			destination = new File(path);
+			for (int i = 0; i < numMoving; i++) {
+				try {
+					copyDirectory(filesMoving.get(i), destination);
+					filesMoving.clear();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			Toast.makeText(getBaseContext(), "Paste successful",
+					Toast.LENGTH_SHORT).show();
 			mode.finish(); // Action picked, so close the CAB
 			return true;
 		default:
@@ -184,16 +231,20 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 	}
 
 	@Override
-	public void onItemCheckedStateChanged(ActionMode mode,int position, long id, boolean checked) {
-		if (checked){
-			String path = mAdapter.getItem(position);
-			Log.e(path, "path");
-			mAdapter.setNewSelection(path, position, true);
+	public void onItemCheckedStateChanged(ActionMode mode, int position,
+			long id, boolean checked) {
+		if (!itemsMoving) {
+			if (checked) {
+				String path = mAdapter.getItem(position);
+				mAdapter.setNewSelection(path, position, true);
+				numMoving++;
+				mode.setTitle(numMoving + " items selected");
+				mode.invalidate();
+			} else if (!checked)
+				mAdapter.removeSelection(position);
 		}
-		else if (!checked)
-			mAdapter.removeSelection(position);
 	}
-	
+
 	// Override back button to move up one level in the filesystem on press
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -210,6 +261,34 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 		return super.onKeyDown(keyCode, event);
 	}
-	
-	
+
+	public void copyDirectory(File sourceLocation, File targetLocation)
+			throws IOException {
+
+		if (sourceLocation.isDirectory()) {
+			if (!targetLocation.exists()) {
+				targetLocation.mkdir();
+			}
+
+			String[] children = sourceLocation.list();
+			for (int i = 0; i < children.length; i++) {
+				copyDirectory(new File(sourceLocation, children[i]), new File(
+						targetLocation, children[i]));
+			}
+		} else {
+
+			InputStream in = new FileInputStream(sourceLocation);
+			OutputStream out = new FileOutputStream(targetLocation);
+
+			// Copy the bits from instream to outstream
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0) {
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		}
+	}
+
 }
