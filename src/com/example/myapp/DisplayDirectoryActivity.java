@@ -225,16 +225,6 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		case R.id.context_delete:
 			this.mode = mode;
 			confirmDelete();
-			selectedPaths = mAdapter.getCurrentPaths();
-			for (int i = 0; i < selectedPaths.size(); i++) {
-				File f = new File(selectedPaths.get(i));
-				DeleteRecursive(f);
-				mAdapter.remove(selectedPaths.get(i));
-				mAdapter.notifyDataSetChanged();
-			}
-			selectedPaths.clear();
-			Toast.makeText(getBaseContext(), "Delete successful", Toast.LENGTH_SHORT).show();
-			mode.finish(); // Action picked, so close the CAB
 			return true;
 
 		case R.id.context_copy:
@@ -349,7 +339,16 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
-		
+		selectedPaths = mAdapter.getCurrentPaths();
+		for (int i = 0; i < selectedPaths.size(); i++) {
+			File f = new File(selectedPaths.get(i));
+			DeleteRecursive(f);
+			mAdapter.remove(selectedPaths.get(i));
+			mAdapter.notifyDataSetChanged();
+		}
+		selectedPaths.clear();
+		Toast.makeText(getBaseContext(), "Delete successful", Toast.LENGTH_SHORT).show();
+		mode.finish(); // Action picked, so close the CAB
 	}
 
 	@Override
