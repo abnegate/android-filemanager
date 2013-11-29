@@ -75,12 +75,14 @@ public final class R {
         public static final int app_title=0x7f050000;
         public static final int button_external=0x7f050003;
         public static final int button_internal=0x7f050002;
+        public static final int confirm=0x7f050012;
         public static final int context_accept_paste=0x7f05000d;
         public static final int context_cancel_paste=0x7f050010;
         public static final int context_copy=0x7f05000b;
         public static final int context_cut=0x7f05000c;
         public static final int context_delete=0x7f05000f;
         public static final int context_properties=0x7f05000e;
+        public static final int dialog_confirm_delete=0x7f050011;
         public static final int display_directory_activity_title=0x7f050004;
         public static final int image_view_description=0x7f050008;
         public static final int textview_pins=0x7f05000a;

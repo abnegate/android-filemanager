@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,7 +29,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class DisplayDirectoryActivity extends Activity implements MultiChoiceModeListener {
+public class DisplayDirectoryActivity extends Activity implements MultiChoiceModeListener, NoticeDialogFragment.NoticeDialogListener {
 
 	ArrayList<String> currentFileList = new ArrayList<String>();
 	List<String> selectedPaths = new ArrayList<String>();
@@ -41,6 +42,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	GridView lv;
 	SelectionAdapter mAdapter;
+	ActionMode mode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -221,6 +223,8 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		// Switch based on menu option clicked
 		switch (item.getItemId()) {
 		case R.id.context_delete:
+			this.mode = mode;
+			confirmDelete();
 			selectedPaths = mAdapter.getCurrentPaths();
 			for (int i = 0; i < selectedPaths.size(); i++) {
 				File f = new File(selectedPaths.get(i));
@@ -260,7 +264,6 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			return true;
 
 		case R.id.context_accept_paste:
-			ProgressDialog.show(getBaseContext(), "Moving files", "1 of 3 files done..");
 			for (int i = 0; i < numMoving; i++) {
 				try {
 					destination = new File(path + "/" + filesMoving.get(i).getName());
@@ -343,5 +346,21 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 		return super.dispatchKeyEvent(event);
 	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		mode.finish();
+		
+	}
+	public void confirmDelete() {
+        // Create an instance of the dialog fragment and show it
+        DialogFragment dialog = new NoticeDialogFragment();
+        dialog.show(getFragmentManager(), "NoticeDialogFragment");
+    }
 
 }

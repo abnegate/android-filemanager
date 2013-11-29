@@ -18,5 +18,7 @@
     <string name="context_properties">Properties</string>
     <string name="context_delete">Delete</string>
     <string name="context_cancel_paste">Cancel</string>
+    <string name="dialog_confirm_delete">Are you sure you want to delete?</string>
+    <string name="confirm">Confirm</string>
 
 </resources>
