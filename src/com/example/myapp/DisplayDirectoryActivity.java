@@ -37,7 +37,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 	String path;
 	File destination;
 	boolean itemsMoving = false;
-	boolean cut = false;
+	static boolean cut = false;
 	int numMoving = 0;
 
 	GridView lv;
@@ -146,7 +146,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	}
 
-	public void copyDirectory(File sourceLocation, File targetLocation, boolean cut) throws IOException {
+	static void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
 		if (sourceLocation.isDirectory() && sourceLocation.exists()) {
 			if (!targetLocation.exists()) {
 				targetLocation.mkdir();
@@ -154,7 +154,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 			String[] children = sourceLocation.list();
 			for (int i = 0; i < children.length; i++) {
-				copyDirectory(new File(sourceLocation, children[i]), new File(targetLocation, children[i]), cut);
+				copyDirectory(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
 			}
 		} else {
 
@@ -174,11 +174,11 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			out = null;
 		}
 		if (cut) {
-			sourceLocation.delete();
+			DeleteRecursive(sourceLocation);
 		}
 	}
 
-	void DeleteRecursive(File fileOrDirectory) {
+	static void DeleteRecursive(File fileOrDirectory) {
 		if (fileOrDirectory.isDirectory())
 			for (File child : fileOrDirectory.listFiles())
 				DeleteRecursive(child);
@@ -207,6 +207,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		filesMoving.clear();
 		selectedPaths.clear();
 		itemsMoving = false;
+		cut = false;
 		numMoving = 0;
 		mode.invalidate();
 	}
@@ -228,6 +229,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			return true;
 
 		case R.id.context_copy:
+			cut = false;
 			itemsMoving = true;
 			selectedPaths = mAdapter.getCurrentPaths();
 			numMoving = selectedPaths.size();
@@ -250,18 +252,14 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			mode.setTitle("Cutting..");
 			mode.invalidate();
 			mAdapter.clearSelection();
-			cut = false;
 			return true;
 
 		case R.id.context_accept_paste:
 			for (int i = 0; i < numMoving; i++) {
-				try {
-					destination = new File(path + "/" + filesMoving.get(i).getName());
-					copyDirectory(filesMoving.get(i).getAbsoluteFile(), destination, cut);
-					currentFileList.add(path + "/" + filesMoving.get(i).getName());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				destination = new File(path + "/" + filesMoving.get(i).getName());
+				MoveFiles copy = new MoveFiles(this.getBaseContext());
+				copy.execute(filesMoving.get(i).getAbsoluteFile(), destination);
+				currentFileList.add(path + "/" + filesMoving.get(i).getName());
 				selectedPaths.clear();
 			}
 			Toast.makeText(getBaseContext(), "Paste successful", Toast.LENGTH_SHORT).show();
@@ -275,7 +273,9 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		default:
 			return false;
 		}
+
 	}
+	
 
 	@Override
 	public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
@@ -361,5 +361,8 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
         DialogFragment dialog = new NoticeDialogFragment();
         dialog.show(getFragmentManager(), "NoticeDialogFragment");
     }
-
+	
+	public static boolean getCut() {
+		return cut;
+	}
 }
