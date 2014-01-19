@@ -11,7 +11,6 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -40,7 +40,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 	static boolean cut = false;
 	int numMoving = 0;
 
-	GridView lv;
+	AbsListView lv;
 	SelectionAdapter mAdapter;
 	ActionMode mode;
 
@@ -84,7 +84,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	public void setupListViewMulti() {
 		// Find the listview
-		lv = (GridView) findViewById(R.id.gridView);
+		lv = (AbsListView) findViewById(R.id.gridView);
 
 		// Set listview to multiple selection mode
 		lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
