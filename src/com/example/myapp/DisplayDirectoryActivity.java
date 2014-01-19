@@ -1,16 +1,12 @@
 package com.example.myapp;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,25 +20,24 @@ import android.webkit.MimeTypeMap;
 import android.widget.AbsListView;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class DisplayDirectoryActivity extends Activity implements MultiChoiceModeListener, NoticeDialogFragment.NoticeDialogListener {
 
-	ArrayList<String> currentFileList = new ArrayList<String>();
-	List<String> selectedPaths = new ArrayList<String>();
-	List<File> filesMoving = new ArrayList<File>();
-	String path;
-	File destination;
-	boolean itemsMoving = false;
-	static boolean cut = false;
-	int numMoving = 0;
+	private ArrayList<String> currentFileList = new ArrayList<String>();
+	private List<String> selectedPaths = new ArrayList<String>();
+	private ArrayList<File> filesMoving = new ArrayList<File>();
+	private String path;
+	private File destination;
+	private boolean itemsMoving = false;
+	private static boolean cut = false;
+	private int numMoving = 0;
 
-	AbsListView lv;
-	SelectionAdapter mAdapter;
-	ActionMode mode;
+	private AbsListView lv;
+	private SelectionAdapter mAdapter;
+	private ActionMode mode;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -146,45 +141,6 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 	}
 
-	static void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
-		if (sourceLocation.isDirectory() && sourceLocation.exists()) {
-			if (!targetLocation.exists()) {
-				targetLocation.mkdir();
-			}
-
-			String[] children = sourceLocation.list();
-			for (int i = 0; i < children.length; i++) {
-				copyDirectory(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
-			}
-		} else {
-
-			InputStream in = new FileInputStream(sourceLocation);
-			OutputStream out = new FileOutputStream(targetLocation);
-
-			// Copy the bits from instream to outstream
-			byte[] buf = new byte[1024];
-			int len;
-			while ((len = in.read(buf)) > 0) {
-				out.write(buf, 0, len);
-			}
-			in.close();
-			in = null;
-			out.flush();
-			out.close();
-			out = null;
-		}
-		if (cut) {
-			DeleteRecursive(sourceLocation);
-		}
-	}
-
-	static void DeleteRecursive(File fileOrDirectory) {
-		if (fileOrDirectory.isDirectory())
-			for (File child : fileOrDirectory.listFiles())
-				DeleteRecursive(child);
-
-		fileOrDirectory.delete();
-	}
 
 	@Override
 	public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -219,6 +175,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 		// Switch based on menu option clicked
@@ -257,12 +214,11 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		case R.id.context_accept_paste:
 			for (int i = 0; i < numMoving; i++) {
 				destination = new File(path + "/" + filesMoving.get(i).getName());
-				MoveFiles copy = new MoveFiles(this.getBaseContext());
-				copy.execute(filesMoving.get(i).getAbsoluteFile(), destination);
+				MoveFiles copy = new MoveFiles(new ProgressDialog(this), destination);
+				copy.execute(filesMoving);
 				currentFileList.add(path + "/" + filesMoving.get(i).getName());
 				selectedPaths.clear();
 			}
-			Toast.makeText(getBaseContext(), "Paste successful", Toast.LENGTH_SHORT).show();
 			mAdapter.notifyDataSetChanged();
 			mode.finish(); // Action picked, so close the CAB
 			return true;
@@ -342,7 +298,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 		selectedPaths = mAdapter.getCurrentPaths();
 		for (int i = 0; i < selectedPaths.size(); i++) {
 			File f = new File(selectedPaths.get(i));
-			DeleteRecursive(f);
+			MoveFiles.DeleteRecursive(f);
 			mAdapter.remove(selectedPaths.get(i));
 			mAdapter.notifyDataSetChanged();
 		}

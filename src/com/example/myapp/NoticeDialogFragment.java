@@ -46,4 +46,5 @@ public class NoticeDialogFragment extends DialogFragment {
         return builder.create();
 
 }
+    
 }
