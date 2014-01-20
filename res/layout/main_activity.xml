@@ -6,49 +6,31 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity" >
-
-    <TextView
-        android:id="@+id/textview_places"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:text="@string/textview_places"
-        android:textSize="30sp" />
-
-    <Button
-        android:id="@+id/button_external"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/textview_places"
-        android:layout_below="@+id/textview_places"
-        android:layout_marginTop="14dp"
-        android:onClick="openExternal"
-        android:text="@string/button_external" />
+    tools:context=".MainActivity" 
+    android:background="@drawable/main_activity">
 
     <Button
         android:id="@+id/button_intenal"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button_external"
-        android:layout_alignBottom="@+id/button_external"
-        android:layout_alignLeft="@+id/textview_places"
-        android:layout_marginTop="35dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="33dp"
+        android:layout_marginLeft="26dp"
         android:onClick="openInternal"
         android:text="@string/button_internal" />
 
-    <TextView
-        android:id="@+id/textview_pins"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/button_external"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="150dp"
-        android:text="@string/textview_pins"
-        android:textSize="30sp" />
+        android:layout_alignBaseline="@+id/button_intenal"
+        android:layout_alignBottom="@+id/button_intenal"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="28dp"
+        android:onClick="openExternal"
+        android:text="@string/button_external" />
 
 </RelativeLayout>
