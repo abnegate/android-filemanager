@@ -30,7 +30,6 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 	private List<String> selectedPaths = new ArrayList<String>();
 	private ArrayList<File> filesMoving = new ArrayList<File>();
 	private String path;
-	private File destination;
 	private boolean itemsMoving = false;
 	private static boolean cut = false;
 	private int numMoving = 0;
@@ -193,7 +192,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			for (int i = 0; i < selectedPaths.size(); i++) {
 				filesMoving.add(new File(selectedPaths.get(i)));
 			}
-			mode.setTitle("Copying..");
+			mode.setTitle("Preparing to copy..");
 			mode.invalidate();
 			mAdapter.clearSelection();
 			return true;
@@ -206,19 +205,18 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 			for (int i = 0; i < selectedPaths.size(); i++) {
 				filesMoving.add(new File(selectedPaths.get(i)));
 			}
-			mode.setTitle("Cutting..");
+			mode.setTitle("Preparing to cut..");
 			mode.invalidate();
 			mAdapter.clearSelection();
 			return true;
 
 		case R.id.context_accept_paste:
-			for (int i = 0; i < numMoving; i++) {
-				destination = new File(path + "/" + filesMoving.get(i).getName());
-				MoveFiles copy = new MoveFiles(new ProgressDialog(this), destination);
-				copy.execute(filesMoving);
+			MoveFiles copy = new MoveFiles(new ProgressDialog(this), path);
+			copy.execute(filesMoving);
+			for (int i = 0; i < filesMoving.size(); i++)
 				currentFileList.add(path + "/" + filesMoving.get(i).getName());
-				selectedPaths.clear();
-			}
+			
+			selectedPaths.clear();
 			mAdapter.notifyDataSetChanged();
 			mode.finish(); // Action picked, so close the CAB
 			return true;

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -16,11 +15,11 @@ import android.util.Log;
 public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 	
 	private ProgressDialog pd;
-	private File destination;
+	private String path;
 	
-	public MoveFiles(ProgressDialog pd, File dest) { 
+	public MoveFiles(ProgressDialog pd, String path) { 
 		this.pd = pd;
-		this.destination = dest;
+		this.path = path;
 	}
 
 	@Override
@@ -28,15 +27,18 @@ public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 		int count = files[0].size();
 		try { 
 			for (int i = 0; i < count; i++) {
+				File destination = new File (path + "/" + files[0].get(i).getName());
+				Log.e("filename", destination.getName());
+				Log.e("filename", destination.getAbsolutePath());
 				copyDirectory(files[0].get(i), destination);
-				publishProgress((int) (i / (float) count) * 100);
-				return true;
+				Log.e("filename", destination.getAbsolutePath());
 			}
-		} catch (IOException e) {
+		} 
+		catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		}
-		return null;
+		return true;
 	}
 	
 	protected void onPreExecute() {
