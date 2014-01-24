@@ -9,8 +9,8 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -213,8 +213,7 @@ public class DisplayDirectoryActivity extends Activity implements MultiChoiceMod
 
 		case R.id.context_accept_paste:
 			MoveFiles copy = new MoveFiles(new ProgressDialog(this), path);
-			Log.e("copy path given", path);
-			copy.execute(filesMoving);	
+			copy.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, filesMoving);
 			for (int i = 0; i < filesMoving.size(); i++)
 				currentFileList.add(path + "/" + filesMoving.get(i).getName());
 			selectedPaths.clear();

@@ -23,16 +23,24 @@ public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 	}
 
 	@Override
-	protected Boolean doInBackground(ArrayList<File>... files) {
-		int count = files[0].size();
+	protected Boolean doInBackground(ArrayList<File>... params) {
+		ArrayList<File> files = new ArrayList<File>();
+		files.addAll(params[0]);
 		try { 
-			for (int i = 0; i < count; i++) {
-				File destination = new File (path + "/" + files[0].get(i).getName());
-				Log.e("filename", destination.getName());
-				Log.e("filename", destination.getAbsolutePath());
-				copyDirectory(files[0].get(i), destination);
-				Log.e("filename", destination.getAbsolutePath());
+			
+			
+			Log.d("count", String.valueOf(files.size()));
+			for (int i = 0 ; i < files.size(); i++) {
+				Log.d("files", files.get(i).getName());
 			}
+			
+			
+			for (int i = 0; i < files.size(); i++) {
+				Log.d("path", path);
+				File destination = new File (path + "/", files.get(i).getName());
+				copyDirectory(files.get(i), destination);
+				 publishProgress((int) ((i / (float) files.size() * 100)));
+				}
 		} 
 		catch (IOException e) {
 			e.printStackTrace();
@@ -46,17 +54,18 @@ public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 		pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 		pd.setMax(100);
 		pd.setIndeterminate(false);
+		pd.setCancelable(true);
 		pd.show();
 	}
 	
 	protected void onPostExecute(Boolean result) {
-		pd.dismiss();
+		pd.setProgress(100);
+		pd.setMessage("Copy complete!");
 	}
 	
 	protected void onProgressUpdate(Integer...progress){
-		pd.setMessage("Copying");
 		pd.setProgress(progress[0]);
-		pd.show();
+		Log.d("progress", String.valueOf(progress[0]));
 	}
 	
 	
