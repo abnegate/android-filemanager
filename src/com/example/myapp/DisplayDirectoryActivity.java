@@ -3,6 +3,7 @@ package com.example.myapp;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
 import android.app.Activity;
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.Menu;
 import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.myapp.NoticeDialogFragment.NoticeDialogListener;
 import com.jakebarnby.filemanager.R;
 
 /**
@@ -22,8 +25,7 @@ import com.jakebarnby.filemanager.R;
  * 
  */
 
-public class DisplayDirectoryActivity extends Activity implements
-		NoticeDialogFragment.NoticeDialogListener {
+public class DisplayDirectoryActivity extends Activity implements NoticeDialogListener {
 
 	private ArrayList<String> currentFileList = new ArrayList<String>();
 	private List<String> selectedPaths = new ArrayList<String>();
@@ -64,6 +66,7 @@ public class DisplayDirectoryActivity extends Activity implements
 		return true;
 	}
 
+	
 	/**
 	 * Populates the currentFileList with all the files/folders in the current
 	 * directory
@@ -80,6 +83,7 @@ public class DisplayDirectoryActivity extends Activity implements
 			currentFileList.add(subFiles[i].getPath());
 		}
 	}
+	
 
 	/**
 	 * Creates and attaches a multi choice listener to the listview so multiple
@@ -93,6 +97,7 @@ public class DisplayDirectoryActivity extends Activity implements
 		lv.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		lv.setMultiChoiceModeListener(new MultiChoiceModeListenerImpl(this));
 	}
+	
 
 	/**
 	 * Creates and attaches an adapter to the listview so the data may be
@@ -113,7 +118,7 @@ public class DisplayDirectoryActivity extends Activity implements
 	 */
 	private void setupListClick() {
 		// Create onClickListener to allow action of clicking listview items
-		lv.setOnItemClickListener(new OnClickListener(this));
+		lv.setOnItemClickListener(new OnItemClickListenerImpl(this));
 	}
 
 	/**
@@ -155,11 +160,7 @@ public class DisplayDirectoryActivity extends Activity implements
 
 		return super.dispatchKeyEvent(event);
 	}
-
-	/**
-	 * TO DO: MOVE ELSEWHERE
-	 */
-	@Override
+	
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		selectedPaths = mAdapter.getCurrentPaths();
 		for (int i = 0; i < selectedPaths.size(); i++) {
@@ -173,18 +174,13 @@ public class DisplayDirectoryActivity extends Activity implements
 				Toast.LENGTH_SHORT).show();
 		mode.finish(); // Action picked, so close the CAB
 	}
-
-	/**
-	 * TO DO: MOVE ELSEWHERE
-	 */
-	@Override
+	
 	public void onDialogNegativeClick(DialogFragment dialog) {
 		mode.finish();
 
 	}
 
-
-	public static boolean getCut() {
+	public boolean getCut() {
 		return cut;
 	}
 
@@ -195,7 +191,7 @@ public class DisplayDirectoryActivity extends Activity implements
 	public void appendPath(String path) {
 		this.path += path;
 	}
-	
+
 	public ArrayList<String> getCurrentFileList() {
 		return currentFileList;
 	}
@@ -234,14 +230,6 @@ public class DisplayDirectoryActivity extends Activity implements
 
 	public void setNumMoving(int numMoving) {
 		this.numMoving = numMoving;
-	}
-
-	public AbsListView getLv() {
-		return lv;
-	}
-
-	public void setLv(AbsListView lv) {
-		this.lv = lv;
 	}
 
 	public SelectionAdapter getmAdapter() {

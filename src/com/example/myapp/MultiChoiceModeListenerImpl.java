@@ -184,11 +184,15 @@ public class MultiChoiceModeListenerImpl implements MultiChoiceModeListener {
 	@SuppressWarnings("unchecked")
 	public boolean contextAcceptPaste(ActionMode mode) {
 		MoveFiles copy = new MoveFiles(new ProgressDialog(d), d.getPath());
-		copy.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-				d.getFilesMoving());
-		for (int i = 0; i < d.getFilesMoving().size(); i++)
-			d.getCurrentFileList().add(
-					d.getPath() + "/" + d.getFilesMoving().get(i).getName());
+		copy.execute(d.getFilesMoving());
+		for (int i = 0; i < d.getFilesMoving().size(); i++) {
+			d.getCurrentFileList().add(d.getPath() + "/" + d.getFilesMoving().get(i).getName());
+		}
+		if (d.getCut()) {
+			for (int i = 0; i < d.getFilesMoving().size(); i++) {
+				MoveFiles.DeleteRecursive(d.getFilesMoving().get(i));
+			}
+		}
 		d.getSelectedPaths().clear();
 		d.getmAdapter().notifyDataSetChanged();
 		mode.finish(); // Action picked, so close the CAB

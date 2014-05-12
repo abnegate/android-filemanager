@@ -10,11 +10,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import com.jakebarnby.filemanager.R;
 
-public class OnClickListener implements OnItemClickListener {
+public class OnItemClickListenerImpl implements OnItemClickListener {
 
 	DisplayDirectoryActivity d;
 
-	public OnClickListener(DisplayDirectoryActivity d) {
+	public OnItemClickListenerImpl(DisplayDirectoryActivity d) {
 		super();
 		this.d = d;
 	}

@@ -96,9 +96,6 @@ public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 			out.close();
 			out = null;
 		}
-		if (DisplayDirectoryActivity.getCut()) {
-			DeleteRecursive(sourceLocation);
-		}
 	}
 
 	static void DeleteRecursive(File fileOrDirectory) {
