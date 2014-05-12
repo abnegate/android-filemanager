@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <group>
+        <item
+            android:id="@+id/context_copy"
+            android:icon="@drawable/ic_action_copy"
+            android:paddingLeft="20dp"
+            android:showAsAction="always|withText"
+            android:title="@string/context_copy"/>
+        <item
+            android:id="@+id/context_cut"
+            android:icon="@drawable/ic_action_cut"
+            android:showAsAction="always|withText"
+            android:title="@string/context_cut"/>
+        <item
+            android:id="@+id/context_delete"
+            android:icon="@drawable/ic_action_discard"
+            android:showAsAction="always|withText"
+            android:title="@string/context_delete"/>
+        <item
+            android:id="@+id/context_properties"
+            android:icon="@drawable/ic_action_settings"
+            android:paddingRight="20dp"
+            android:showAsAction="always|withText"
+            android:title="@string/context_properties"/>
+        <item
+            android:id="@+id/context_accept_paste"
+            android:icon="@drawable/ic_action_done"
+            android:paddingRight="20dp"
+            android:showAsAction="never"
+            android:title="@string/context_accept_paste"/>
+        <item
+            android:id="@+id/context_cancel_paste"
+            android:icon="@drawable/ic_action_cancel"
+            android:paddingLeft="20dp"
+            android:showAsAction="never"
+            android:title="@string/context_cancel_paste"/>
+    </group>
+
+</menu>
