@@ -10,45 +10,41 @@ import java.util.ArrayList;
 
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
 
-public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
-	
+public class ASyncCopyFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
+
 	private ProgressDialog pd;
 	private String path;
-	
-	public MoveFiles(ProgressDialog pd, String path) { 
+
+	public ASyncCopyFiles(ProgressDialog pd, String path) {
 		this.pd = pd;
 		this.path = path;
 	}
 
-	@Override
+
 	protected Boolean doInBackground(ArrayList<File>... params) {
-		ArrayList<File> files = new ArrayList<File>();
-		files.addAll(params[0]);
-		try { 
-			
-			
-			Log.d("count", String.valueOf(files.size()));
-			for (int i = 0 ; i < files.size(); i++) {
-				Log.d("files", files.get(i).getName());
+		
+		ArrayList<File> sourceFiles = new ArrayList<File>();
+		sourceFiles.addAll(params[0]);
+		try {
+			for (int i = 0; i < sourceFiles.size(); i++) {
+				
+				File destination = new File(path + "/", sourceFiles.get(i).getName());
+				Log.d("current drectory", destination.getAbsolutePath());
+				
+				
+				copyDirectory(sourceFiles.get(i), destination);
+				publishProgress((int) ((i / (float) sourceFiles.size() * 100)));
 			}
-			
-			
-			for (int i = 0; i < files.size(); i++) {
-				Log.d("path", path);
-				File destination = new File (path + "/", files.get(i).getName());
-				copyDirectory(files.get(i), destination);
-				 publishProgress((int) ((i / (float) files.size() * 100)));
-				}
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			Log.e("check", "Could not write file " + e.getMessage());
 			return false;
 		}
 		return true;
 	}
-	
+
 	protected void onPreExecute() {
 		pd.setMessage("Please wait..");
 		pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -57,19 +53,23 @@ public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 		pd.setCancelable(true);
 		pd.show();
 	}
-	
+
 	protected void onPostExecute(Boolean result) {
 		pd.setProgress(100);
 		pd.setMessage("Copy complete!");
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                pd.dismiss();
+            }}, 2000);
 	}
-	
-	protected void onProgressUpdate(Integer...progress){
+
+	protected void onProgressUpdate(Integer... progress) {
 		pd.setProgress(progress[0]);
 		Log.d("progress", String.valueOf(progress[0]));
 	}
-	
-	
-	static void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
+
+	public void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
 		if (sourceLocation.isDirectory() && sourceLocation.exists()) {
 			if (!targetLocation.exists()) {
 				targetLocation.mkdir();
@@ -77,7 +77,8 @@ public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 
 			String[] children = sourceLocation.list();
 			for (int i = 0; i < children.length; i++) {
-				copyDirectory(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
+				copyDirectory(new File(sourceLocation, children[i]), new File(
+						targetLocation, children[i]));
 			}
 		} else {
 
@@ -97,13 +98,4 @@ public class MoveFiles extends AsyncTask<ArrayList<File>, Integer, Boolean> {
 			out = null;
 		}
 	}
-
-	static void DeleteRecursive(File fileOrDirectory) {
-		if (fileOrDirectory.isDirectory())
-			for (File child : fileOrDirectory.listFiles())
-				DeleteRecursive(child);
-
-		fileOrDirectory.delete();
-	}
-
 }

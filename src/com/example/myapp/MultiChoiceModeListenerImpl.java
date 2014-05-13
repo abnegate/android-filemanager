@@ -1,6 +1,7 @@
 package com.example.myapp;
 
 import java.io.File;
+
 import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -9,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.AbsListView.MultiChoiceModeListener;
+
 import com.jakebarnby.filemanager.R;
 
 /**
@@ -181,17 +183,16 @@ public class MultiChoiceModeListenerImpl implements MultiChoiceModeListener {
 	 * @param mode The action mode in use
 	 * @return If the action was successful
 	 */
+
 	@SuppressWarnings("unchecked")
 	public boolean contextAcceptPaste(ActionMode mode) {
-		MoveFiles copy = new MoveFiles(new ProgressDialog(d), d.getPath());
-		copy.execute(d.getFilesMoving());
+		
+		ASyncCopyFiles copy = new ASyncCopyFiles(new ProgressDialog(d), d.getPath());
+		copy.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, d.getFilesMoving());
+		
+		
 		for (int i = 0; i < d.getFilesMoving().size(); i++) {
 			d.getCurrentFileList().add(d.getPath() + "/" + d.getFilesMoving().get(i).getName());
-		}
-		if (d.getCut()) {
-			for (int i = 0; i < d.getFilesMoving().size(); i++) {
-				MoveFiles.DeleteRecursive(d.getFilesMoving().get(i));
-			}
 		}
 		d.getSelectedPaths().clear();
 		d.getmAdapter().notifyDataSetChanged();

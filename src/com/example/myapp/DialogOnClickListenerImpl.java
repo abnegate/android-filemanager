@@ -34,8 +34,8 @@ public class DialogOnClickListenerImpl implements OnClickListener, NoticeDialogF
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		d.setSelectedPaths(d.getmAdapter().getCurrentPaths());
 		for (int i = 0; i < d.getSelectedPaths().size(); i++) {
-			File f = new File(d.getSelectedPaths().get(i));
-			MoveFiles.DeleteRecursive(f);
+			//File f = new File(d.getSelectedPaths().get(i));
+			//ASyncCopyFiles.DeleteRecursive(f);
 			d.getmAdapter().remove(d.getSelectedPaths().get(i));
 			d.getmAdapter().notifyDataSetChanged();
 		}

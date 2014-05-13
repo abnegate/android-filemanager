@@ -6,6 +6,8 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ActionMode;
 import android.view.KeyEvent;
@@ -161,17 +163,16 @@ public class DisplayDirectoryActivity extends Activity implements NoticeDialogLi
 		return super.dispatchKeyEvent(event);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		selectedPaths = mAdapter.getCurrentPaths();
-		for (int i = 0; i < selectedPaths.size(); i++) {
-			File f = new File(selectedPaths.get(i));
-			MoveFiles.DeleteRecursive(f);
-			mAdapter.remove(selectedPaths.get(i));
-			mAdapter.notifyDataSetChanged();
+		ASyncDeleteFiles delete = new ASyncDeleteFiles(new ProgressDialog(this));
+		delete.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, selectedPaths);
+		for (int i =0; i < selectedPaths.size(); i++) {
+		mAdapter.remove(selectedPaths.get(i));
 		}
+		mAdapter.notifyDataSetChanged();
 		selectedPaths.clear();
-		Toast.makeText(getBaseContext(), "Delete successful",
-				Toast.LENGTH_SHORT).show();
 		mode.finish(); // Action picked, so close the CAB
 	}
 	
