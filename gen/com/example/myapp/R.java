@@ -24,36 +24,48 @@ public final class R {
         public static final int app_icon=0x7f020000;
         public static final int file=0x7f020001;
         public static final int folder=0x7f020002;
-        public static final int ic_action_search=0x7f020003;
-        public static final int ic_launcher=0x7f020004;
-        public static final int ic_menu_copy_holo_dark=0x7f020005;
-        public static final int ic_menu_cut_holo_dark=0x7f020006;
-        public static final int ic_menu_delete=0x7f020007;
-        public static final int ic_menu_paste_holo_dark=0x7f020008;
-        public static final int ic_menu_preferences=0x7f020009;
+        public static final int ic_action_cancel=0x7f020003;
+        public static final int ic_action_copy=0x7f020004;
+        public static final int ic_action_cut=0x7f020005;
+        public static final int ic_action_discard=0x7f020006;
+        public static final int ic_action_done=0x7f020007;
+        public static final int ic_action_new=0x7f020008;
+        public static final int ic_action_paste=0x7f020009;
+        public static final int ic_action_search=0x7f02000a;
+        public static final int ic_action_settings=0x7f02000b;
+        public static final int ic_arrow=0x7f02000c;
+        public static final int ic_launcher=0x7f02000d;
+        public static final int main_activity=0x7f02000e;
+        public static final int main_activity2=0x7f02000f;
     }
     public static final class id {
-        public static final int action_search=0x7f08000e;
-        public static final int action_search_directory=0x7f08000c;
-        public static final int action_settings=0x7f08000d;
+        public static final int GridItem=0x7f080009;
+        public static final int action_search=0x7f080012;
+        public static final int action_search_directory=0x7f080010;
+        public static final int action_settings=0x7f080011;
+        public static final int arrow=0x7f080006;
         public static final int button_external=0x7f080002;
-        public static final int button_intenal=0x7f080003;
-        public static final int context_copy=0x7f080007;
-        public static final int context_cut=0x7f080008;
-        public static final int context_delete=0x7f08000a;
-        public static final int context_paste=0x7f080009;
-        public static final int context_properties=0x7f08000b;
-        public static final int file=0x7f080006;
+        public static final int button_intenal=0x7f080001;
+        public static final int cancel=0x7f080004;
+        public static final int context_accept_paste=0x7f08000e;
+        public static final int context_cancel_paste=0x7f08000f;
+        public static final int context_copy=0x7f08000a;
+        public static final int context_cut=0x7f08000b;
+        public static final int context_delete=0x7f08000c;
+        public static final int context_properties=0x7f08000d;
+        public static final int dialog_text=0x7f080003;
+        public static final int file=0x7f080007;
+        public static final int filesContained=0x7f080008;
+        public static final int gridView=0x7f080000;
         public static final int img=0x7f080005;
-        public static final int listView=0x7f080000;
-        public static final int textview_pins=0x7f080004;
-        public static final int textview_places=0x7f080001;
     }
     public static final class layout {
-        public static final int display_directory_activity=0x7f030000;
-        public static final int main_activity=0x7f030001;
-        public static final int row_list_item=0x7f030002;
-        public static final int searchable=0x7f030003;
+        public static final int card_background=0x7f030000;
+        public static final int display_directory_activity=0x7f030001;
+        public static final int main_activity=0x7f030002;
+        public static final int progress_dialog=0x7f030003;
+        public static final int row_list_item=0x7f030004;
+        public static final int searchable=0x7f030005;
     }
     public static final class menu {
         public static final int context=0x7f070000;
@@ -67,11 +79,14 @@ public final class R {
         public static final int app_title=0x7f050000;
         public static final int button_external=0x7f050003;
         public static final int button_internal=0x7f050002;
+        public static final int confirm=0x7f050012;
+        public static final int context_accept_paste=0x7f05000d;
+        public static final int context_cancel_paste=0x7f050010;
         public static final int context_copy=0x7f05000b;
         public static final int context_cut=0x7f05000c;
         public static final int context_delete=0x7f05000f;
-        public static final int context_paste=0x7f05000d;
         public static final int context_properties=0x7f05000e;
+        public static final int dialog_confirm_delete=0x7f050011;
         public static final int display_directory_activity_title=0x7f050004;
         public static final int image_view_description=0x7f050008;
         public static final int textview_pins=0x7f05000a;
@@ -105,5 +120,11 @@ public final class R {
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f060001;
+        /**  the theme applied to the application or activity 
+         */
+        public static final int CustomActionBarTheme=0x7f060002;
+        /**  ActionBar styles 
+         */
+        public static final int MyActionBar=0x7f060003;
     }
 }

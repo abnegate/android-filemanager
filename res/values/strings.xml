@@ -14,8 +14,11 @@
     <string name="textview_pins">Pins:</string>
     <string name="context_copy">Copy</string>
     <string name="context_cut">Cut</string>
-    <string name="context_paste">Paste</string>
+    <string name="context_accept_paste">Paste</string>
     <string name="context_properties">Properties</string>
     <string name="context_delete">Delete</string>
+    <string name="context_cancel_paste">Cancel</string>
+    <string name="dialog_confirm_delete">Are you sure you want to delete?</string>
+    <string name="confirm">Confirm</string>
 
 </resources>

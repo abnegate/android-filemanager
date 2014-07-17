@@ -1,30 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal" >
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" 
+	android:layout_height="?android:attr/listPreferredItemHeight">
 
-    <ImageView
-        android:id="@+id/img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/image_view_description"
-        android:paddingBottom="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp" />
-
-   <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="23dp"
-            android:textSize="15sp" />
-
-    </LinearLayout>
-
-</LinearLayout>
+	<!-- ListRow Left side Thumbnail image -->
+	<LinearLayout android:layout_width="match_parent"
+		android:layout_height="match_parent" 
+		android:layout_marginLeft="6dp"
+		android:layout_marginRight="6dp" 
+		android:layout_marginTop="4dp"
+		android:layout_marginBottom="4dp" 
+		android:background="@layout/card_background">
+		
+		<ImageView android:id="@+id/img" 
+		    android:contentDescription="@string/image_view_description"
+			android:layout_width="45dp" 
+			android:layout_height="45dp"
+			android:paddingTop="5dp" />
+	</LinearLayout>
+	
+	<!-- Rightend Arrow -->
+	<ImageView android:id="@+id/arrow"
+		android:contentDescription="@string/image_view_description"
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true" 
+		android:layout_centerVertical="true"
+		android:src="@drawable/ic_arrow" />
+	<!-- File -->
+	
+	<TextView android:id="@+id/file" 
+	    android:layout_width="wrap_content"
+		android:layout_height="wrap_content" 
+		android:layout_marginLeft="60dp" 
+		android:layout_centerVertical="true"
+		android:paddingBottom="5dp" 
+		android:textColor="#040404"
+		android:textSize="15sp" />
+	<!-- Weather Information -->
+	
+	<TextView android:id="@+id/filesContained"
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/file" 
+		android:layout_alignLeft="@+id/file"
+		android:paddingTop="5dip" 
+		android:layout_centerHorizontal="true"
+		android:textSize="15sp" />
+</RelativeLayout>
